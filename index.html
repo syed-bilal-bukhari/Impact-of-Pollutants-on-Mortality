@@ -983,9 +983,347 @@
       .next-page-nav a:hover .nav-arrow {
         transform: translateX(3px);
       }
+
+      /* ── Hamburger button (hidden on desktop) ── */
+      .hamburger {
+        display: none;
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        z-index: 30;
+        width: 42px;
+        height: 42px;
+        border: none;
+        border-radius: 10px;
+        background: #2d3a1a;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+        cursor: pointer;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 0;
+        -webkit-tap-highlight-color: transparent;
+        transition: background 0.2s ease;
+      }
+
+      .hamburger span {
+        display: block;
+        width: 20px;
+        height: 2px;
+        background: #bdd373;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+        transform-origin: center;
+      }
+
+      .sidebar-open .hamburger span:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+      }
+      .sidebar-open .hamburger span:nth-child(2) {
+        opacity: 0;
+      }
+      .sidebar-open .hamburger span:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+      }
+
+      /* ── Sidebar overlay backdrop (hidden on desktop) ── */
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 9;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      /* ══════════════════════════════════════════
+         RESPONSIVE — screens ≤ 768px
+         ══════════════════════════════════════════ */
+      @media (max-width: 768px) {
+        /* Show hamburger */
+        .hamburger {
+          display: flex;
+        }
+
+        /* Sidebar becomes slide-in overlay */
+        .sidebar {
+          transform: translateX(-100%);
+          transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+          z-index: 20;
+          width: 280px;
+        }
+
+        .sidebar-open .sidebar {
+          transform: translateX(0);
+        }
+
+        .sidebar-open .sidebar-overlay {
+          display: block;
+          opacity: 1;
+        }
+
+        /* Also show overlay (invisible) when closed so transition works */
+        .sidebar-overlay {
+          display: block;
+          pointer-events: none;
+          opacity: 0;
+        }
+        .sidebar-open .sidebar-overlay {
+          pointer-events: auto;
+          opacity: 1;
+        }
+
+        /* Main content — full-width, no sidebar offset */
+        .main {
+          margin-left: 0;
+          padding: 4.5rem 1.25rem 2rem;
+          max-width: 100%;
+          width: 100%;
+        }
+
+        /* ── Typography scale-down ── */
+        .page h1 {
+          font-size: 1.6rem;
+          margin-bottom: 0.4rem;
+        }
+
+        .page h2 {
+          font-size: 1.25rem;
+          margin-top: 2rem;
+        }
+
+        .page h3 {
+          font-size: 1.05rem;
+        }
+
+        .page p,
+        .page ol,
+        .page ul {
+          font-size: 0.95rem;
+          line-height: 1.75;
+        }
+
+        .page .subtitle {
+          font-size: 0.85rem;
+          margin-bottom: 1.5rem;
+        }
+
+        /* ── Tables — horizontal scroll ── */
+        .page table {
+          display: block;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          white-space: nowrap;
+          max-width: 100%;
+        }
+
+        .page table td:first-child {
+          white-space: nowrap;
+        }
+
+        /* ── Table grid (2x2) — single column on mobile ── */
+        .table-grid {
+          grid-template-columns: 1fr;
+          width: 100%;
+          overflow-x: auto;
+        }
+
+        /* ── Table + figure side-by-side — stack ── */
+        .table-figure-row {
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .table-figure-row > table,
+        .table-figure-row > .figure {
+          width: 100%;
+        }
+
+        /* ── Float-right figures — unfloat on mobile ── */
+        .figure.float-right {
+          float: none;
+          max-width: 100%;
+          margin: 1.25rem 0;
+        }
+
+        .figure-stack-right {
+          float: none;
+          width: 100%;
+          margin: 1rem 0;
+        }
+
+        /* ── Figure grid — single column on small screens ── */
+        .figure-grid {
+          grid-template-columns: 1fr;
+        }
+
+        /* ── Inner tabs — scroll horizontally if they overflow ── */
+        .inner-tabs {
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          flex-wrap: nowrap;
+          gap: 0;
+          padding-bottom: 0;
+          scrollbar-width: none;
+        }
+
+        .inner-tabs::-webkit-scrollbar {
+          display: none;
+        }
+
+        .inner-tabs button {
+          flex-shrink: 0;
+          padding: 0.5rem 0.85rem;
+          font-size: 0.78rem;
+          white-space: nowrap;
+        }
+
+        /* ── Pipeline diagram — horizontal scroll ── */
+        .pipeline {
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          padding-bottom: 0.5rem;
+          min-height: auto;
+        }
+
+        .pipeline-stage.sources,
+        .pipeline-stage.process,
+        .pipeline-stage.result {
+          flex-shrink: 0;
+        }
+
+        .process-node {
+          width: 100px;
+          height: 100px;
+          font-size: 0.65rem;
+        }
+
+        .process-node svg {
+          width: 20px;
+          height: 20px;
+        }
+
+        .pipe-card .card-title {
+          font-size: 0.72rem;
+        }
+
+        .pipe-card .card-meta {
+          font-size: 0.62rem;
+        }
+
+        /* ── Source links — wrap nicely ── */
+        .source-link {
+          font-size: 0.78rem;
+          padding: 0.4rem 0.75rem;
+        }
+
+        /* ── Formula blocks — scroll if needed ── */
+        .formula-block {
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          padding: 0.7rem 0.9rem;
+        }
+
+        /* ── Formula popup — constrain to viewport ── */
+        .formula-popup {
+          max-width: calc(100vw - 2rem);
+          left: 1rem !important;
+          right: 1rem;
+        }
+
+        /* ── Next-page nav ── */
+        .next-page-nav a {
+          font-size: 0.82rem;
+          padding: 0.5rem 1rem;
+        }
+
+        /* ── Pipeline detail panel ── */
+        .pipeline-detail.open {
+          max-height: 600px;
+        }
+
+        .pipeline-detail-inner {
+          padding: 0.8rem 1rem;
+        }
+
+        /* ── KaTeX overflow protection ── */
+        .katex-display {
+          overflow-x: auto;
+          overflow-y: hidden;
+          -webkit-overflow-scrolling: touch;
+          padding: 0.25rem 0;
+        }
+      }
+
+      /* ══════════════════════════════════════════
+         RESPONSIVE — very small screens ≤ 480px
+         ══════════════════════════════════════════ */
+      @media (max-width: 480px) {
+        .main {
+          padding: 4rem 1rem 1.5rem;
+        }
+
+        .page h1 {
+          font-size: 1.35rem;
+        }
+
+        .page h2 {
+          font-size: 1.1rem;
+        }
+
+        .page p,
+        .page ol,
+        .page ul {
+          font-size: 0.9rem;
+          line-height: 1.7;
+        }
+
+        .sidebar {
+          width: 260px;
+        }
+
+        .sidebar h2 {
+          font-size: 0.9rem;
+          padding: 0 1.25rem 1.25rem;
+        }
+
+        .sidebar nav a {
+          font-size: 0.82rem;
+          padding: 0.6rem 0.85rem;
+        }
+
+        .figure-grid {
+          gap: 4px;
+        }
+
+        .result-card .stat {
+          font-size: 1.1rem;
+        }
+
+        .inner-tabs button {
+          font-size: 0.72rem;
+          padding: 0.45rem 0.7rem;
+        }
+      }
     </style>
   </head>
   <body>
+    <!-- Mobile hamburger button -->
+    <button
+      class="hamburger"
+      aria-label="Open menu"
+      onclick="document.body.classList.toggle('sidebar-open')"
+    >
+      <span></span><span></span><span></span>
+    </button>
+    <div
+      class="sidebar-overlay"
+      onclick="document.body.classList.remove('sidebar-open')"
+    ></div>
+
     <!-- Sidebar -->
     <aside class="sidebar">
       <h2>Impact of Pollutants on Mortality</h2>
@@ -1034,7 +1372,11 @@
       <div class="sidebar-credits">
         <div class="credits-author">
           <div class="credits-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"
+              />
+            </svg>
           </div>
           <div>
             <div class="credits-label">Author</div>
@@ -1042,16 +1384,43 @@
           </div>
         </div>
         <div class="credits-links">
-          <a href="https://www.linkedin.com/in/syedbelall/" target="_blank" rel="noopener noreferrer" class="credits-link">
-            <svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+          <a
+            href="https://www.linkedin.com/in/syedbelall/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="credits-link"
+          >
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"
+              />
+            </svg>
             Follow on LinkedIn
           </a>
-          <a href="https://github.com/syed-bilal-bukhari" target="_blank" rel="noopener noreferrer" class="credits-link">
-            <svg viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/></svg>
+          <a
+            href="https://github.com/syed-bilal-bukhari"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="credits-link"
+          >
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"
+              />
+            </svg>
             Follow on GitHub
           </a>
-          <a href="https://github.com/syed-bilal-bukhari/Impact-of-Pollutants-on-Mortality" target="_blank" rel="noopener noreferrer" class="credits-link">
-            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM9.54 15.65l1.86 1.86-1.41 1.41L6.34 15.3l3.64-3.64 1.41 1.41-1.85 1.86h5.66v2h-5.66z"/></svg>
+          <a
+            href="https://github.com/syed-bilal-bukhari/Impact-of-Pollutants-on-Mortality"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="credits-link"
+          >
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM9.54 15.65l1.86 1.86-1.41 1.41L6.34 15.3l3.64-3.64 1.41 1.41-1.85 1.86h5.66v2h-5.66z"
+              />
+            </svg>
             View Repository
           </a>
         </div>
@@ -4384,6 +4753,9 @@
           // Toggle active page
           document.querySelector(".page.active").classList.remove("active");
           document.getElementById(link.dataset.page).classList.add("active");
+
+          // Close sidebar on mobile after navigation
+          document.body.classList.remove("sidebar-open");
         });
       });
 
@@ -4469,6 +4841,7 @@
           link.classList.add("active");
           document.querySelector(".page.active").classList.remove("active");
           document.getElementById(pageId).classList.add("active");
+          document.body.classList.remove("sidebar-open");
           window.scrollTo(0, 0);
         }
 
