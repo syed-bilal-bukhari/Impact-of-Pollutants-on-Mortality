@@ -1,0 +1,4443 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Impact of Pollutants on Mortality</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+    />
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
+    ></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    ></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        display: flex;
+        min-height: 100vh;
+        background: #f4f6f1;
+        color: #334155;
+      }
+
+      /* ── Sidebar ── */
+      .sidebar {
+        width: 280px;
+        background: linear-gradient(180deg, #2d3a1a 0%, #1f2b12 100%);
+        color: #e2e8d0;
+        padding: 2rem 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        overflow-y: auto;
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+        z-index: 10;
+      }
+
+      .sidebar h2 {
+        font-size: 1rem;
+        font-weight: 600;
+        padding: 0 1.5rem 1.5rem;
+        letter-spacing: -0.01em;
+        line-height: 1.5;
+        color: #d5e4a8;
+        border-bottom: 1px solid rgba(189, 211, 115, 0.15);
+      }
+
+      .sidebar nav {
+        display: flex;
+        flex-direction: column;
+        padding: 0.75rem 0.75rem;
+        gap: 2px;
+      }
+
+      .sidebar nav a {
+        color: #9aab7a;
+        text-decoration: none;
+        padding: 0.7rem 1rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        position: relative;
+      }
+
+      .sidebar nav a:visited {
+        color: #9aab7a;
+      }
+
+      .sidebar nav a:hover {
+        background: rgba(189, 211, 115, 0.1);
+        color: #d5e4a8;
+      }
+
+      .sidebar nav a.active {
+        background: rgba(189, 211, 115, 0.15);
+        color: #bdd373;
+      }
+
+      .sidebar nav a.sub-tab {
+        padding-left: 2.2rem;
+        font-size: 0.82rem;
+        color: #7a8e64;
+      }
+
+      /* ── Main content ── */
+      .main {
+        margin-left: 280px;
+        flex: 1;
+        padding: 3rem 3.5rem;
+        max-width: 1000px;
+      }
+
+      /* ── Sections (pages) ── */
+      .page {
+        display: none;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .page.active {
+        display: block;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .page h1 {
+        font-family: "Source Serif 4", Georgia, serif;
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: #2d3a1a;
+        letter-spacing: -0.02em;
+      }
+
+      .page .subtitle {
+        font-size: 0.95rem;
+        color: #64748b;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #d5e4a8;
+      }
+
+      .page p {
+        font-family: "Source Serif 4", Georgia, serif;
+        line-height: 1.9;
+        color: #3d4a3a;
+        font-size: 1.05rem;
+        margin-bottom: 1.25rem;
+        text-align: justify;
+      }
+
+      .page h2 {
+        font-family: "Source Serif 4", Georgia, serif;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #2d3a1a;
+        margin-top: 2.5rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .page ol {
+        font-family: "Source Serif 4", Georgia, serif;
+        line-height: 1.9;
+        color: #3d4a3a;
+        font-size: 1.05rem;
+        margin-bottom: 1.25rem;
+        padding-left: 1.5rem;
+        text-align: justify;
+      }
+
+      .page ol li,
+      .page ul li {
+        margin-bottom: 0.75rem;
+      }
+
+      .page ul {
+        font-family: "Source Serif 4", Georgia, serif;
+        line-height: 1.9;
+        color: #3d4a3a;
+        font-size: 1.05rem;
+        margin-bottom: 1.25rem;
+        padding-left: 1.5rem;
+        text-align: justify;
+        list-style-type: disc;
+      }
+
+      .page ul ol {
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+        padding-left: 1.5rem;
+      }
+
+      .page ul ol li {
+        margin-bottom: 0.35rem;
+      }
+
+      .source-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-family: "Inter", sans-serif;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #4d6a2a;
+        background: rgba(189, 211, 115, 0.18);
+        border: 1px solid rgba(189, 211, 115, 0.4);
+        padding: 0.45rem 1rem;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        margin-top: 0.25rem;
+        margin-right: 0.5rem;
+      }
+
+      .source-link:hover {
+        background: rgba(189, 211, 115, 0.35);
+        color: #2d3a1a;
+      }
+
+      .source-link svg {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
+      }
+
+      /* ── Inner tabs (Data Preprocessing) ── */
+      .inner-tabs {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 2rem;
+        border-bottom: 2px solid #e2e8d0;
+        padding-bottom: 0;
+      }
+
+      .inner-tabs button {
+        font-family: "Inter", sans-serif;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #6b7f5a;
+        background: none;
+        border: none;
+        padding: 0.6rem 1.2rem;
+        cursor: pointer;
+        position: relative;
+        bottom: -2px;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s ease;
+      }
+
+      .inner-tabs button:hover {
+        color: #3d5a1e;
+      }
+
+      .inner-tabs button.active {
+        color: #2d3a1a;
+        border-bottom: 2px solid #bdd373;
+      }
+
+      .inner-panel {
+        display: none;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .inner-panel.active {
+        display: block;
+      }
+
+      /* ── Tables ── */
+      .page table {
+        width: auto;
+        border-collapse: collapse;
+        font-family: "Inter", sans-serif;
+        font-size: 0.78rem;
+        line-height: 1.35;
+        margin: 1rem auto;
+        border: 1px solid #d0d9c0;
+      }
+
+      .page table caption {
+        font-family: "Inter", sans-serif;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #4d5a3a;
+        text-align: center;
+        margin-bottom: 0.4rem;
+        font-style: italic;
+      }
+
+      .page table th {
+        background: #2d3a1a;
+        color: #e8eedd;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        text-align: left;
+        padding: 0.4rem 0.75rem;
+      }
+
+      .page table td {
+        padding: 0.3rem 0.75rem;
+        border-bottom: 1px solid #e5ead8;
+        color: #3d4a3a;
+        vertical-align: top;
+      }
+
+      .page table td:first-child {
+        font-weight: 500;
+        white-space: nowrap;
+        color: #2d3a1a;
+      }
+
+      .page table tr:hover td {
+        background: rgba(189, 211, 115, 0.08);
+      }
+
+      /* ── Inner headings (h3) ── */
+      .page h3 {
+        font-family: "Source Serif 4", Georgia, serif;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2d3a1a;
+        margin-top: 2rem;
+        margin-bottom: 0.6rem;
+      }
+
+      /* ── Formula tooltips ── */
+      .formula-tooltip {
+        border-bottom: 1.5px dashed #bdd373;
+        cursor: help;
+      }
+      .formula-popup {
+        position: fixed;
+        background: #fff;
+        border: 1px solid #d0d9c0;
+        border-left: 3px solid #bdd373;
+        border-radius: 6px;
+        padding: 0.5rem 0.8rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        z-index: 1000;
+        text-align: center;
+        font-style: normal;
+        font-weight: normal;
+        pointer-events: none;
+      }
+      .formula-popup .tip-label {
+        font-family: "Inter", sans-serif;
+        font-size: 0.62rem;
+        font-weight: 600;
+        color: #6b7f5a;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 0.25rem;
+      }
+      .formula-popup .tip-def {
+        font-family: "Source Serif 4", serif;
+        font-size: 0.75rem;
+        color: #475569;
+        margin-bottom: 0.4rem;
+        font-style: italic;
+      }
+      .formula-popup .tip-where {
+        font-family: "Inter", sans-serif;
+        font-size: 0.65rem;
+        color: #7a8e64;
+        margin-top: 0.35rem;
+        border-top: 1px solid #e2e8d0;
+        padding-top: 0.3rem;
+      }
+
+      .formula-block {
+        background: #fff;
+        border: 1px solid #e2e8d0;
+        border-left: 3px solid #bdd373;
+        border-radius: 6px;
+        padding: 0.9rem 1.2rem;
+        margin: 1rem 0;
+        overflow-x: auto;
+        text-align: center;
+      }
+
+      .formula-label {
+        font-family: "Inter", sans-serif;
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: #6b7f5a;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 0.5rem;
+        text-align: left;
+      }
+
+      .formula-step {
+        font-family: "Inter", sans-serif;
+        font-size: 0.82rem;
+        font-weight: 500;
+        color: #3d5a1e;
+        margin: 1.2rem 0 0.3rem;
+      }
+
+      /* ── Figures ── */
+      .figure {
+        margin: 1.5rem 0;
+        text-align: center;
+      }
+
+      .figure.float-right {
+        float: right;
+        margin: 0.25rem 0 1rem 1.5rem;
+        max-width: 50%;
+        text-align: center;
+      }
+
+      .figure img {
+        max-width: 100%;
+        border-radius: 8px;
+        border: 1px solid #e2e8d0;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      }
+
+      .figure figcaption {
+        font-family: "Inter", sans-serif;
+        font-size: 0.78rem;
+        color: #6b7f5a;
+        margin-top: 0.5rem;
+        font-style: italic;
+      }
+
+      /* ── Figure grid (facets) ── */
+      .figure-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        margin: 1.5rem 0;
+      }
+
+      .figure-grid img {
+        width: 100%;
+        border-radius: 6px;
+        border: 1px solid #e2e8d0;
+      }
+
+      .figure-grid figcaption {
+        grid-column: 1 / -1;
+        font-family: "Inter", sans-serif;
+        font-size: 0.78rem;
+        color: #6b7f5a;
+        text-align: center;
+        font-style: italic;
+        margin-top: 0.3rem;
+      }
+
+      /* ── Stacked float figures ── */
+      .figure-stack-right {
+        float: right;
+        margin: 0 0 0.5rem 1.2rem;
+        width: 44%;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .figure-stack-right .stack-item img {
+        width: 100%;
+        border-radius: 6px;
+        border: 1px solid #e2e8d0;
+      }
+
+      .figure-stack-right .stack-item figcaption {
+        font-family: "Inter", sans-serif;
+        font-size: 0.7rem;
+        color: #6b7f5a;
+        text-align: center;
+        font-style: italic;
+        margin-top: 2px;
+      }
+
+      /* ── Side-by-side table + figure ── */
+      .table-figure-row {
+        display: flex;
+        gap: 1.5rem;
+        align-items: flex-start;
+        margin: 1.2rem 0;
+      }
+      .table-figure-row > table {
+        width: 50%;
+        flex-shrink: 0;
+      }
+      .table-figure-row > .figure {
+        width: 50%;
+        flex-shrink: 0;
+        margin: 0;
+      }
+
+      /* ── Table grid (2x2 nested tables) ── */
+      .table-grid-caption {
+        font-family: "Inter", sans-serif;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #4d5a3a;
+        text-align: center;
+        margin-bottom: 0.5rem;
+        font-style: italic;
+      }
+
+      .table-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+        margin: 1rem auto;
+        border: 1px solid #d0d9c0;
+        width: fit-content;
+      }
+
+      .table-grid .grid-cell {
+        border: 1px solid #d0d9c0;
+      }
+
+      .table-grid .grid-cell-header {
+        font-family: "Inter", sans-serif;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-align: center;
+        padding: 0.35rem 0.5rem;
+        background: #3d4a2a;
+        color: #e8eedd;
+        letter-spacing: 0.03em;
+      }
+
+      .table-grid table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: "Inter", sans-serif;
+        font-size: 0.72rem;
+        line-height: 1.3;
+        margin: 0;
+        border: none;
+      }
+
+      .table-grid table th {
+        background: #2d3a1a;
+        color: #e8eedd;
+        font-weight: 600;
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        text-align: right;
+        padding: 0.3rem 0.5rem;
+      }
+
+      .table-grid table th:first-child {
+        text-align: left;
+      }
+
+      .table-grid table td {
+        padding: 0.22rem 0.5rem;
+        border-bottom: 1px solid #eef1e6;
+        color: #3d4a3a;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .table-grid table td:first-child {
+        text-align: left;
+        font-weight: 500;
+        color: #2d3a1a;
+      }
+
+      /* ── Pipeline Visualization ── */
+      .pipeline {
+        display: flex;
+        align-items: stretch;
+        gap: 0;
+        margin: 1.5rem 0 0.5rem;
+        font-family: "Inter", sans-serif;
+        position: relative;
+        min-height: 280px;
+      }
+
+      .pipeline-stage {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        justify-content: center;
+        position: relative;
+        z-index: 2;
+      }
+
+      .pipeline-stage.sources {
+        flex: 0 0 200px;
+      }
+      .pipeline-stage.process {
+        flex: 0 0 180px;
+        align-items: center;
+      }
+      .pipeline-stage.result {
+        flex: 0 0 200px;
+      }
+
+      .pipeline-arrows {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 30px;
+        max-width: 50px;
+      }
+
+      .pipeline-arrows svg {
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+      }
+
+      /* Source cards */
+      .pipe-card {
+        background: #fff;
+        border: 1px solid #d5e4a8;
+        border-radius: 10px;
+        padding: 0.7rem 0.9rem;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        position: relative;
+      }
+
+      .pipe-card:hover {
+        border-color: #bdd373;
+        box-shadow: 0 4px 16px rgba(189, 211, 115, 0.25);
+        transform: translateY(-2px);
+      }
+
+      .pipe-card.active {
+        border-color: #bdd373;
+        box-shadow: 0 2px 12px rgba(189, 211, 115, 0.3);
+      }
+
+      .pipe-card .card-title {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #2d3a1a;
+        margin-bottom: 0.25rem;
+      }
+
+      .pipe-card .card-meta {
+        font-size: 0.68rem;
+        color: #6b7f5a;
+        line-height: 1.4;
+      }
+
+      .pipe-card .card-badge {
+        display: inline-block;
+        font-size: 0.62rem;
+        font-weight: 600;
+        padding: 0.15rem 0.45rem;
+        border-radius: 4px;
+        margin-top: 0.35rem;
+      }
+
+      .badge-green {
+        background: rgba(189, 211, 115, 0.2);
+        color: #4d6a2a;
+      }
+
+      .badge-red {
+        background: rgba(220, 80, 80, 0.12);
+        color: #a03030;
+      }
+
+      /* Process node */
+      .process-node {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2d3a1a, #3d5a1e);
+        color: #e8eedd;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: 0.72rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 20px rgba(45, 58, 26, 0.3);
+        position: relative;
+      }
+
+      .process-node:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 28px rgba(45, 58, 26, 0.4);
+      }
+
+      .process-node svg {
+        width: 24px;
+        height: 24px;
+        margin-bottom: 4px;
+        stroke: #bdd373;
+      }
+
+      /* Result card */
+      .result-card {
+        background: linear-gradient(
+          135deg,
+          rgba(189, 211, 115, 0.12),
+          rgba(189, 211, 115, 0.04)
+        );
+        border: 2px solid #bdd373;
+        border-radius: 12px;
+        padding: 1rem;
+        text-align: center;
+      }
+
+      .result-card .card-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #2d3a1a;
+        margin-bottom: 0.3rem;
+      }
+
+      .result-card .card-meta {
+        font-size: 0.7rem;
+        color: #4d6a2a;
+        line-height: 1.5;
+      }
+
+      .result-card .stat {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #2d3a1a;
+        margin: 0.4rem 0;
+      }
+
+      /* Detail panel (slides open below pipeline) */
+      .pipeline-detail {
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+        transition:
+          max-height 0.4s ease,
+          opacity 0.3s ease,
+          margin 0.3s ease;
+        background: #fff;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        font-family: "Inter", sans-serif;
+        margin: 0;
+      }
+
+      .pipeline-detail.open {
+        max-height: 500px;
+        opacity: 1;
+        margin: 0.5rem 0 1rem;
+        border-color: #d5e4a8;
+      }
+
+      .pipeline-detail-inner {
+        padding: 1rem 1.2rem;
+      }
+
+      .pipeline-detail h4 {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #2d3a1a;
+        margin-bottom: 0.6rem;
+      }
+
+      .pipeline-detail .dropped-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .pipeline-detail .dropped-tag {
+        font-size: 0.68rem;
+        padding: 0.2rem 0.55rem;
+        border-radius: 4px;
+        background: rgba(220, 80, 80, 0.1);
+        color: #a03030;
+        font-weight: 500;
+      }
+
+      .pipeline-detail .kept-tag {
+        font-size: 0.68rem;
+        padding: 0.2rem 0.55rem;
+        border-radius: 4px;
+        background: rgba(189, 211, 115, 0.2);
+        color: #4d6a2a;
+        font-weight: 500;
+      }
+
+      .pipeline-detail .detail-section {
+        margin-bottom: 0.8rem;
+      }
+
+      .pipeline-detail .detail-section:last-child {
+        margin-bottom: 0;
+      }
+
+      /* Animated flow dots on SVG paths */
+      @keyframes flowDot {
+        0% {
+          offset-distance: 0%;
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          offset-distance: 100%;
+          opacity: 0;
+        }
+      }
+
+      .flow-dot {
+        width: 6px;
+        height: 6px;
+        background: #bdd373;
+        border-radius: 50%;
+        position: absolute;
+        offset-rotate: 0deg;
+        animation: flowDot 2s linear infinite;
+      }
+
+      /* ── Next-page navigation arrow ── */
+      .next-page-nav {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 3rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #d0d9c0;
+      }
+
+      .next-page-nav a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        text-decoration: none;
+        color: #4a5a2e;
+        font-family: "Inter", sans-serif;
+        font-size: 0.9rem;
+        font-weight: 600;
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        background: rgba(189, 211, 115, 0.15);
+        border: 1px solid rgba(189, 211, 115, 0.3);
+        transition: all 0.25s ease;
+        cursor: pointer;
+      }
+
+      .next-page-nav a:hover {
+        background: rgba(189, 211, 115, 0.35);
+        border-color: #bdd373;
+        transform: translateX(4px);
+      }
+
+      .next-page-nav .nav-label {
+        font-size: 0.75rem;
+        font-weight: 400;
+        color: #7a8a5e;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .next-page-nav .nav-title {
+        display: block;
+      }
+
+      .next-page-nav .nav-arrow {
+        font-size: 1.3rem;
+        transition: transform 0.25s ease;
+      }
+
+      .next-page-nav a:hover .nav-arrow {
+        transform: translateX(3px);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h2>Impact of Pollutants on Mortality</h2>
+      <nav>
+        <a href="#abstract" data-page="abstract" class="active">Abstract</a>
+        <a href="#introduction" data-page="introduction">Introduction</a>
+        <a href="#dataset" data-page="dataset"
+          >Dataset Gathering &amp; Selection</a
+        >
+        <a href="#data-preprocessing" data-page="data-preprocessing"
+          >Data Preprocessing</a
+        >
+        <a
+          href="#data-consolidation"
+          data-page="data-consolidation"
+          class="sub-tab"
+          >Data Consolidation</a
+        >
+        <a href="#feature-engineering" data-page="feature-engineering"
+          >Feature Engineering</a
+        >
+        <a href="#analysis" data-page="analysis">Analysis</a>
+        <a
+          href="#analysis-pollutants"
+          data-page="analysis-pollutants"
+          class="sub-tab"
+          >Pollutants</a
+        >
+        <a
+          href="#analysis-mortality"
+          data-page="analysis-mortality"
+          class="sub-tab"
+          >Mortality</a
+        >
+        <a href="#analysis-impact" data-page="analysis-impact" class="sub-tab"
+          >Impact on Mortality</a
+        >
+        <a href="#predictive-modelling" data-page="predictive-modelling"
+          >Predictive Modelling</a
+        >
+        <a href="#conclusion" data-page="conclusion">Conclusion</a>
+      </nav>
+    </aside>
+
+    <!-- Main content area -->
+    <div class="main">
+      <section id="abstract" class="page active">
+        <h1>Abstract</h1>
+        <p>
+          Air pollution is widely recognized as one of the most critical
+          environmental and public health threats of the 21st century,
+          contributing significantly to global mortality. This research examines
+          the relationship between air pollution exposure and mortality trends
+          on a global scale by integrating three robust, open-access datasets
+          including the State of Global Air, the IHME Death Data with Causes,
+          and the World Bank Population Dataset. These datasets were selected
+          from an initial pool of seven based on their global coverage, temporal
+          depth, data quality, and relevance to public health outcomes.
+        </p>
+        <p>
+          Using advanced statistical methods and machine learning techniques,
+          this research explores temporal patterns, regional disparities, and
+          population-level vulnerabilities associated with major pollutants,
+          particularly fine particulate matter (PM&#8322;.&#8325;), ozone
+          (O&#8323;), household air pollutant (HAP) and nitrogen dioxide
+          (NO&#8322;). Incorporating population data enables the calculation of
+          per-capita mortality rates, ensuring valid cross-country comparisons
+          and preventing biases driven by differences in national population
+          sizes.
+        </p>
+        <p>
+          The findings offer critical insights for policymakers, public health
+          authorities, and researchers by identifying high-risk populations and
+          geographic hotspots, and reinforcing the urgency of targeted
+          interventions and stricter air quality standards. Overall, this study
+          demonstrates the potential of data science to address complex,
+          interdisciplinary challenges in environmental epidemiology and global
+          health.
+        </p>
+      </section>
+
+      <section id="introduction" class="page">
+        <h1>Introduction</h1>
+        <p>
+          Air pollution is one of the most concerning environmental health
+          challenges of our time. The World Health Organization defines it as
+          the presence of harmful substances in the atmosphere, including fine
+          particulate matter (PM&#8322;.&#8325; and PM&#8321;&#8320;), nitrogen
+          dioxide (NO&#8322;), ozone (O&#8323;), sulphur dioxide (SO&#8322;),
+          and carbon monoxide (CO). Among these, fine particulate matter
+          (PM&#8322;.&#8325;) is particularly harmful because it can penetrate
+          deep into the lungs, enter the bloodstream, and contribute to diseases
+          such as cardiovascular illness, chronic respiratory disease, and
+          premature death. Global assessments show that air pollution is one of
+          the top risk factors for early mortality, responsible for millions of
+          deaths each year (Cohen, et al., 2017) (Di, et al., 2017).
+        </p>
+
+        <h2>1.1 &nbsp; Background and Motivation</h2>
+        <p>
+          Over the past three decades, progress has been made in monitoring and
+          reducing air pollution. However, the global burden of disease remains
+          high. Estimates suggest that in 2015 alone, exposure to
+          PM&#8322;.&#8325; caused about 4.2 million deaths worldwide, while
+          ozone exposure caused an additional 254,000 deaths, making air
+          pollution one of the leading global health risks (Cohen, et al.,
+          2017). Importantly, evidence shows that health effects can occur even
+          when air pollution levels are below the legal limits set by
+          international agencies such as the World Health Organization (WHO) and
+          the U.S. Environmental Protection Agency (EPA) (Di, et al., 2017).
+        </p>
+        <p>
+          This makes continuous monitoring and deeper understanding of the risks
+          essential. The motivation for this research comes from recognising
+          that air pollution is not only a local or regional problem, but a
+          global one. With the increasing availability of large, high-quality
+          datasets, we can now study mortality patterns across countries and
+          decades, linking pollution exposure to health outcomes in new ways.
+          Using data science techniques to uncover these patterns offers a
+          powerful opportunity to better understand risks, identify long-term
+          trends, and generate evidence that can support public health decisions
+          worldwide.
+        </p>
+
+        <h2>1.2 &nbsp; Problem Statement</h2>
+        <p>
+          Despite strong evidence linking air pollution with mortality, most
+          existing studies have key limitations. Many focus on specific regions
+          or short time periods, which restricts understanding of long-term
+          global trends. Few studies integrate pollution, cause-of-death, and
+          population datasets to assess how mortality varies over time when
+          adjusted for population size.
+        </p>
+        <p>
+          Another major concern is that health risks are observed even when
+          pollution levels are below the safety thresholds set by international
+          agencies such as the World Health Organization (WHO) and the U.S.
+          Environmental Protection Agency (EPA) (Cohen, et al., 2017) (Di, et
+          al., 2017). This raises doubts about whether current air quality
+          standards are sufficient to protect public health.
+        </p>
+        <p>
+          The problem this analysis addresses is the lack of a comprehensive,
+          global, population-adjusted analysis of how major pollutants
+          (PM&#8322;.&#8325;, NO&#8322;, household air pollution, and O&#8323;)
+          contribute to cause-specific mortality from 1990 to 2020.
+        </p>
+
+        <h2>1.3 &nbsp; Objectives</h2>
+        <p>
+          The main objective of this analysis is to evaluate how long-term
+          exposure to air pollution contributes to mortality across countries,
+          population sizes, and time periods.
+        </p>
+        <p>
+          To achieve this, the study pursues the following specific objectives:
+        </p>
+        <ol>
+          <li>
+            To quantify the relationship between exposure to key pollutants
+            (PM&#8322;.&#8325;, O&#8323;, HAP and NO&#8322;) and all-cause and
+            cause-specific mortality using globally corresponding datasets,
+            while adjusting mortality rates relative to national population
+            sizes.
+          </li>
+          <li>
+            To assess whether pollution exposure remains a significant mortality
+            risk even at concentrations below current international safety
+            thresholds, such as those set by the WHO and U.S EPA.
+          </li>
+          <li>
+            To identify and compare global, regional, and national temporal
+            trends in both pollution levels and population-adjusted mortality,
+            evaluating changes over time from 1990 to 2020.
+          </li>
+          <li>
+            To visualize key findings using advanced data visualisation
+            techniques such as time-series plots, heat maps, choropleth maps,
+            and scatter plots highlight geographic hotspots and temporal
+            variations.
+          </li>
+          <li>
+            To apply both traditional statistical tools (e.g., Pearson
+            correlation, linear and multiple regression) and data-driven
+            modelling approaches (e.g., stratified analysis, predictive
+            modelling, composite pollution index modelling) to provide a
+            multidimensional view of the problem.
+          </li>
+          <li>
+            To contribute to global environmental health by identifying at-risk
+            populations and highlighting areas where stronger regulations or
+            targeted interventions could deliver the greatest health benefits.
+          </li>
+        </ol>
+
+        <h2>1.4 &nbsp; Research Questions</h2>
+        <ol>
+          <li>
+            What are the long-term global and regional trends in air pollution
+            levels, particularly PM&#8322;.&#8325; and ozone, over the past
+            three decades?
+          </li>
+          <li>
+            How does long-term exposure to air pollution correlate with
+            population-adjusted, cause-specific mortality, including deaths from
+            cardiovascular, respiratory, and cancer-related diseases?
+          </li>
+          <li>
+            Which countries and regions show the highest mortality burden from
+            air pollution once adjusted for population size?
+          </li>
+          <li>
+            Which air pollutants and related factors are the strongest
+            predictors of increased mortality when analysed using data science
+            methods such as correlation analysis, regression models, and
+            clustering?
+          </li>
+        </ol>
+
+        <h2>1.5 &nbsp; Impact and Significance</h2>
+        <p>
+          The findings of this research have both scientific and practical
+          importance. Scientifically, the study contributes to a growing body of
+          evidence on how long-term exposure to air pollution affects health
+          worldwide. By applying advanced statistical and machine learning
+          techniques to global datasets, this analysis shows the value of
+          integrating data science with public health research.
+        </p>
+        <p>
+          From a policy perspective, the results can help international
+          agencies, governments, and local authorities in setting or revising
+          air quality standards. If the analysis shows that health risks persist
+          below current thresholds, that calls for stricter regulations. If
+          pollutants are identified as hotspots, it can help target
+          interventions where they are most needed.
+        </p>
+        <p>
+          More broadly, this research highlights the human and societal costs of
+          air pollution, framing it not only as an environmental issue but also
+          as a matter of global health equity. By adjusting mortality rates for
+          population size and tracking changes over time, this research provides
+          a fairer and more comprehensive view of how air pollution affects
+          global mortality.
+        </p>
+      </section>
+
+      <section id="dataset" class="page">
+        <h1>Dataset Gathering &amp; Selection</h1>
+
+        <h2>2.1 &nbsp; Initial Exploration</h2>
+        <p>
+          A crucial step in this research was identifying datasets capable of
+          supporting a strong investigation into the relationship between air
+          pollution and mortality. The goal was to find sources offering global
+          coverage over an extended time frame, with well-documented and clean
+          variables, and a clear link between pollution indicators and mortality
+          outcomes.
+        </p>
+        <p>
+          The dataset search was conducted through academic databases (Google
+          Scholar, ScienceDirect, Kaggle, GitHub), institutional repositories
+          such as the World Health Organization (WHO), and open-access
+          environmental data portals. More than a dozen datasets were
+          identified, each differing in geographic coverage, temporal depth, and
+          thematic relevance. After an initial check for completeness, ease of
+          access, and relevance to the research goals, seven datasets were
+          selected for closer evaluation.
+        </p>
+
+        <h2>2.2 &nbsp; Dataset Selection</h2>
+        <p>
+          Following the exclusion process, three datasets emerged as the most
+          suitable for meeting the research objectives: the State of Global Air
+          Dataset and the IHME Death Data with Causes (Global Burden of
+          Disease). Their strengths lie in their methodological robustness,
+          breadth of coverage, and direct relevance to studying the air
+          pollution-mortality relationship. A third dataset, the World Bank
+          Population Dataset was included to ensure comparability of results
+          across countries of different sizes.
+        </p>
+
+        <h2>2.2.1 &nbsp; State of Global Air Dataset</h2>
+        <ul>
+          <li><strong>Source:</strong> Health Effects Institute.</li>
+          <li>
+            <strong>Content:</strong> Provides global, annual,
+            population-weighted data on pollutant levels including
+            PM&#8322;.&#8325;, household air pollution (HAP), NO&#8322;, and
+            ambient ozone for more than 200 countries from 1990 through 2021
+            (Health Effects Institute, 2024).
+          </li>
+          <li>
+            <strong>Justification:</strong> This dataset gives the exposure side
+            of the analysis. It offers long-term, reliable measures of major
+            pollutants, which are essential for identifying trends and making
+            fair comparisons across countries and regions.
+          </li>
+        </ul>
+        <a
+          href="https://www.stateofglobalair.org/data#/air/plot"
+          target="_blank"
+          rel="noopener"
+          class="source-link"
+          ><svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-4.5-6H18m0 0v4.5m0-4.5L10.5 13.5"
+            />
+          </svg>
+          View Dataset</a
+        >
+
+        <h2>
+          2.2.2 &nbsp; IHME Death Data with Causes (Global Burden of Disease)
+        </h2>
+        <ul>
+          <li>
+            <strong>Source:</strong> Institute for Health Metrics and
+            Evaluation.
+          </li>
+          <li>
+            <strong>Content:</strong> This dataset provides yearly
+            cause-specific mortality data for 206 countries, covering the period
+            from 1990 to 2023 (with historical estimates available back to the
+            1960s). It includes more than 300 diseases, conditions, and injuries
+            as causes of death (Institute for Health Metrics and Evaluation,
+            2024).
+          </li>
+          <li>
+            <strong>Justification:</strong> This dataset was selected because it
+            offers detailed information on deaths by specific causes across more
+            than 200 countries for over three decades. When combined with the
+            State of Global Air dataset, it allows the study to connect
+            pollution exposure with health outcomes in a clear and reliable way.
+          </li>
+        </ul>
+        <a
+          href="https://vizhub.healthdata.org/gbd-results/"
+          target="_blank"
+          rel="noopener"
+          class="source-link"
+          ><svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-4.5-6H18m0 0v4.5m0-4.5L10.5 13.5"
+            />
+          </svg>
+          View Dataset</a
+        >
+
+        <h2>2.2.3 &nbsp; Population Dataset</h2>
+        <ul>
+          <li>
+            <strong>Source:</strong> The population dataset was obtained from
+            the datasets/population repository on GitHub (DataHub.io, 2025).
+            Unlike platforms such as Kaggle, where individuals can freely upload
+            datasets, this repository is maintained by Datahub.io, a
+            well-regarded open data provider that aggregates and standardizes
+            datasets from official sources. The dataset is not user-generated
+            but is compiled directly from the official World Bank data (World
+            Bank, 2023), as confirmed in the repository's documentation. The
+            repository has strong community recognition (over 100 stars on
+            GitHub), indicating trust and active use.
+          </li>
+          <li>
+            <strong>Data Origins:</strong> The World Bank dataset itself
+            compiles data from several authoritative international and national
+            demographic sources, including:
+            <ol>
+              <li>
+                United Nations Population Division (World Population Prospects)
+              </li>
+              <li>
+                United Nations Statistical Division (Population and Vital
+                Statistics Reports, various years)
+              </li>
+              <li>
+                Census reports and other publications from national statistical
+                offices
+              </li>
+              <li>Eurostat (Demographic Statistics)</li>
+              <li>
+                Secretariat of the Pacific Community (Statistics and Demography
+                Programme)
+              </li>
+              <li>U.S. Census Bureau (International Database)</li>
+            </ol>
+          </li>
+          <li>
+            <strong>Content:</strong> Provides annual population figures for
+            countries, regions (e.g., Asia), and the world, covering 1960
+            onwards. For this research, data for 1990&ndash;2020 were extracted
+            to match the time range of the mortality and pollution datasets.
+          </li>
+          <li>
+            <strong>Justification:</strong> Population adjustment was essential
+            to avoid misleading results. Absolute death counts can exaggerate
+            the burden in highly populated countries and underestimate it in
+            smaller ones. By adjusting mortality figures relative to population
+            size (e.g., Crude Death Rate per 1000 people or Population Growth
+            Rate), the analysis ensures fair comparisons across countries and
+            years. This reduces bias and prevents countries being misclassified
+            as "outliers" simply due to population scale rather than true
+            underlying risk. Using per-capita measures therefore provides
+            results that are more accurate, balanced, and meaningful for
+            cross-country and temporal analysis.
+          </li>
+        </ul>
+        <a
+          href="https://datahub.io/core/population"
+          target="_blank"
+          rel="noopener"
+          class="source-link"
+          ><svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-4.5-6H18m0 0v4.5m0-4.5L10.5 13.5"
+            />
+          </svg>
+          View Dataset (DataHub.io)</a
+        >
+        <a
+          href="https://github.com/datasets/population"
+          target="_blank"
+          rel="noopener"
+          class="source-link"
+          ><svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-4.5-6H18m0 0v4.5m0-4.5L10.5 13.5"
+            />
+          </svg>
+          View Dataset (GitHub)</a
+        >
+      </section>
+
+      <section id="data-preprocessing" class="page">
+        <h1>Data Preprocessing</h1>
+
+        <div class="inner-tabs">
+          <button class="active" data-panel="pp-pollutants">
+            State of Global Air
+          </button>
+          <button data-panel="pp-deaths">IHME Death Data</button>
+          <button data-panel="pp-population">Population Data</button>
+        </div>
+
+        <div id="pp-pollutants" class="inner-panel active">
+          <h2>3.1 &nbsp; Overview</h2>
+          <p>
+            Before conducting statistical modelling and analysis, it was
+            essential to prepare the raw datasets to ensure reliability,
+            consistency, and compatibility with each other. The data originated
+            from different sources and therefore varied in format and structure.
+            To achieve comparability, a structured preprocessing was
+            implemented. This included selection of analytically relevant
+            features, standardisation of variable names and data types, handling
+            of missing values, detection and handling of outliers and alignment
+            of country-year identifiers. Each dataset was first cleaned
+            individually and subsequently integrated into a unified master
+            dataset covering 1990&ndash;2020.
+          </p>
+
+          <h2>3.2 &nbsp; Pollutants Data</h2>
+          <p>
+            The pollutants dataset was compiled from four CSV files containing
+            annual country-level exposure estimates for Household Air Pollution
+            (HAP), Nitrogen Dioxide (NO&#8322;), Ozone (O&#8323;), and
+            Particulate Matter (PM&#8322;.&#8325;). Raw files contained
+            Excel-style artefacts (e.g., values stored as "=Country"), which
+            were corrected using string replacement and type conversion to
+            ensure numerical compatibility.
+          </p>
+
+          <h3>3.2.1 &nbsp; Feature Selection</h3>
+          <p>
+            Feature selection focused on retaining only essential attributes.
+            Redundant identifiers were excluded as they duplicated existing
+            information or provided no analytical value. A detailed list of
+            dropped features is:
+          </p>
+
+          <table>
+            <caption>
+              Table 1: Summary of dropped features for pollutants dataset
+            </caption>
+            <thead>
+              <tr>
+                <th>Feature Name</th>
+                <th>Reason to Drop</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Exposure Id</td>
+                <td>
+                  Serves as a unique identifier thus, does not offer analytical
+                  value.
+                </td>
+              </tr>
+              <tr>
+                <td>Type</td>
+                <td>
+                  Contains a single constant value, "Country", indicating the
+                  level of aggregation which provides no variability or insight.
+                </td>
+              </tr>
+              <tr>
+                <td>ISO3</td>
+                <td>
+                  Merely reiterates the country designation in ISO3 format which
+                  was redundant alongside the full country name.
+                </td>
+              </tr>
+              <tr>
+                <td>Region</td>
+                <td>
+                  Contains only two values, distinguishing whether a record
+                  pertains to a region or country, information already implied
+                  or unneeded in our use case.
+                </td>
+              </tr>
+              <tr>
+                <td>Pollutant</td>
+                <td>
+                  Although it specifies the pollutant type, we will refactor
+                  exposure metrics by applying suffix of pollutant name, making
+                  this column unnecessary.
+                </td>
+              </tr>
+              <tr>
+                <td>Pollutant Name</td>
+                <td>A duplicate of the Pollutant column, thus redundant.</td>
+              </tr>
+              <tr>
+                <td>Region Name</td>
+                <td>
+                  Uniformly states "GDB Region" for relevant rows and offers no
+                  analytical distinction.
+                </td>
+              </tr>
+              <tr>
+                <td>Units</td>
+                <td>
+                  Indicates the measurement units for pollutants. While relevant
+                  from a reporting standpoint, the unit is consistent across
+                  datasets and will be addressed in the methodological
+                  literature. Hence, its repetition in every row is unnecessary.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p>Each dataset was therefore reduced to six key fields:</p>
+          <ul>
+            <li><strong>Country:</strong> specifying the name of country.</li>
+            <li>
+              <strong>Region Name:</strong> reflecting more accurately the
+              contents of the column, which specifies regional labels.
+            </li>
+            <li>
+              <strong>Year:</strong> records the year of data collection;
+              necessary for temporal trend analysis.
+            </li>
+            <li>
+              <strong>Exposure estimates:</strong>
+              <ul>
+                <li>
+                  Exposure Mean: specifying the average rate of respective
+                  pollutant.
+                </li>
+                <li>
+                  Exposure Lower: specifying the lower bound, likely the 95%
+                  confidence interval representing uncertainty in data
+                  collection.
+                </li>
+                <li>
+                  Exposure Upper: specifying the upper bound, likely the 95%
+                  confidence interval representing uncertainty in data
+                  collection.
+                </li>
+              </ul>
+            </li>
+          </ul>
+
+          <h3>3.2.2 &nbsp; Outlier Detection</h3>
+          <p>
+            Outlier detection for environmental time series data requires
+            special consideration, since pollution levels naturally change over
+            time due to industrialization, policy changes, and other factors.
+            Using traditional methods such as IQR across the entire dataset can
+            incorrectly flag outliers, simply because they represent a different
+            time period.
+          </p>
+          <p>
+            Given that our dataset has yearly granularity, with only one
+            observation per country per year, detection approaches need to
+            account for this structure. We implemented and compared the
+            following methods:
+          </p>
+          <ul>
+            <li>
+              <strong>Year-Specific Comparison:</strong> For each year,
+              pollution levels are compared across all countries, identifying
+              countries with unusually high or low values relative to global
+              patterns for that specific year.
+            </li>
+            <li>
+              <strong>Country-Specific Temporal Deviation:</strong> Each
+              country's historical pattern is analysed to identify years that
+              deviate significantly from the country's expected temporal trend.
+            </li>
+          </ul>
+          <p>
+            These approaches account for both the yearly granularity of the data
+            and the importance of considering temporal trends when identifying
+            genuine outliers in environmental datasets. Since the dataset was
+            gathered from reputable sources, it was expected that there would be
+            no true outliers in the data.
+          </p>
+
+          <h3>3.2.3 &nbsp; Resultant Dataset</h3>
+          <p>
+            We merged the 4 files into 1 master pollutant dataset and to avoid
+            ambiguity when merging pollutants, variable names were standardised
+            with pollutant-specific suffixes (e.g., Exposure Mean
+            PM&#8322;.&#8325;, Exposure Mean NO&#8322;). The four datasets were
+            merged on Country and Year, producing a consolidated panel of
+            multi-pollutant exposures.
+          </p>
+        </div>
+
+        <div id="pp-deaths" class="inner-panel">
+          <h2>3.3 &nbsp; Mortality Data</h2>
+          <p>
+            Mortality data were obtained from the Global Burden of Disease (GBD)
+            study (IHME) and comprised 4 large CSV files containing almost 5 lac
+            rows each. As the files represented different subsets of causes and
+            locations, preprocessing aimed to obtain fully concatenated dataset
+            catering the complete cause-specific mortality distribution of 3
+            decades for 200 countries.
+          </p>
+
+          <h3>3.3.1 &nbsp; Feature Selection</h3>
+          <p>
+            Feature selection focused on retaining only essential attributes.
+            Redundant identifiers were excluded as they duplicated existing
+            information or provided no analytical value. A detailed list of
+            dropped features is:
+          </p>
+
+          <table>
+            <caption>
+              Table 2: Summary of dropped features for mortality dataset
+            </caption>
+            <thead>
+              <tr>
+                <th>Feature Name</th>
+                <th>Reason to Drop</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>measure_name</td>
+                <td>Always indicates "Death", adding no analytical value.</td>
+              </tr>
+              <tr>
+                <td>sex_name</td>
+                <td>Always indicates "BOTH", adding no analytical value.</td>
+              </tr>
+              <tr>
+                <td>age_id</td>
+                <td>
+                  Always indicates "All Ages", adding no analytical value.
+                </td>
+              </tr>
+              <tr>
+                <td>metric_name</td>
+                <td>
+                  Always indicates "Number", offering no variation or additional
+                  insight.
+                </td>
+              </tr>
+              <tr>
+                <td>sex_id</td>
+                <td>
+                  A unique identifier for sex which was not needed for analysis.
+                </td>
+              </tr>
+              <tr>
+                <td>measure_id</td>
+                <td>
+                  A unique identifier for the measure which was not needed for
+                  analysis.
+                </td>
+              </tr>
+              <tr>
+                <td>location_id</td>
+                <td>
+                  A unique identifier for the location which was not needed for
+                  analysis.
+                </td>
+              </tr>
+              <tr>
+                <td>cause_id</td>
+                <td>
+                  A unique identifier for the cause which was not needed for
+                  analysis.
+                </td>
+              </tr>
+              <tr>
+                <td>metric_id</td>
+                <td>
+                  A unique identifier for the metric, irrelevant to the
+                  analysis.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>3.3.2 &nbsp; Duplication Detection</h3>
+          <p>
+            Since each record in the ultimate dataset represents number of
+            deaths in a country caused by a specific cause, we checked for
+            duplicates in dataset based on country, year, and cause and there
+            were none found indicating the well reputed source's authenticity.
+          </p>
+
+          <h3>3.3.3 &nbsp; Resultant Dataset</h3>
+          <p>
+            Thus, after merging and some renaming ultimately the dataset was in
+            one file with 1,467,168 rows and these 6 columns:
+          </p>
+          <ul>
+            <li>
+              <strong>Country:</strong> specifying the name of country,
+              necessary for regional analysis.
+            </li>
+            <li><strong>Cause:</strong> specifying the cause of death.</li>
+            <li>
+              <strong>Year:</strong> records the year of data collection,
+              necessary for temporal trend analysis.
+            </li>
+            <li>
+              <strong>Deaths:</strong> indicating the average number of deaths.
+            </li>
+            <li>
+              <strong>Deaths Upper:</strong> specifying the upper limit of
+              uncertainty in data collection.
+            </li>
+            <li>
+              <strong>Deaths Lower:</strong> specifying the lower limit of
+              uncertainty in data collection.
+            </li>
+          </ul>
+        </div>
+
+        <div id="pp-population" class="inner-panel">
+          <h2>3.4 &nbsp; Population Data</h2>
+          <p>
+            Population data were sourced from the World Bank, covering the
+            period 1960&ndash;2023. The dataset was trimmed to the analysis
+            window (1990&ndash;2020) and reduced to three attributes: Country,
+            Year, and Population. Redundant Country Code feature was removed. No
+            missing values or outliers were detected in this data as well
+            explaining the authenticity of origin as well as source.
+          </p>
+        </div>
+      </section>
+
+      <section id="data-consolidation" class="page">
+        <h1>Data Consolidation</h1>
+        <p>
+          The three datasets: pollutants, mortality, and population were
+          harmonised through careful alignment of country identifiers and
+          temporal coverage. Using the pollutants dataset as the base, mortality
+          counts, and population figures were merged by Country-Year. This
+          enabled the derivation of per-capita mortality rates alongside
+          exposure estimates. Post-merge validation confirmed that no records
+          were lost, no new missing values were introduced, and all values were
+          consistent with official demographic and health statistics.
+        </p>
+
+        <!-- Pipeline Visualization -->
+        <div class="pipeline">
+          <!-- Source cards -->
+          <div class="pipeline-stage sources">
+            <div class="pipe-card" data-detail="detail-pollutants">
+              <div class="card-title">State of Global Air</div>
+              <div class="card-meta">
+                4 CSV files &middot; PM&#8322;.&#8325;, NO&#8322;, O&#8323;, HAP
+              </div>
+              <span class="card-badge badge-green"
+                >14 features &rarr; 6 kept</span
+              >
+            </div>
+            <div class="pipe-card" data-detail="detail-deaths">
+              <div class="card-title">IHME Death Data</div>
+              <div class="card-meta">4 CSV files &middot; ~500K rows each</div>
+              <span class="card-badge badge-green"
+                >15 features &rarr; 6 kept</span
+              >
+            </div>
+            <div class="pipe-card" data-detail="detail-population">
+              <div class="card-title">World Bank Population</div>
+              <div class="card-meta">1 CSV file &middot; 1960&ndash;2023</div>
+              <span class="card-badge badge-green"
+                >4 features &rarr; 3 kept</span
+              >
+            </div>
+          </div>
+
+          <!-- Arrows left -->
+          <div class="pipeline-arrows">
+            <svg viewBox="0 0 25 100" preserveAspectRatio="none">
+              <path
+                d="M0,20 C20,20 20,50 40,50"
+                stroke="#bdd373"
+                stroke-width="2"
+                fill="none"
+                opacity="0.5"
+              />
+              <path
+                d="M0,50 L40,50"
+                stroke="#bdd373"
+                stroke-width="2"
+                fill="none"
+                opacity="0.5"
+              />
+              <path
+                d="M0,80 C20,80 20,50 40,50"
+                stroke="#bdd373"
+                stroke-width="2"
+                fill="none"
+                opacity="0.5"
+              />
+            </svg>
+          </div>
+
+          <!-- Process node -->
+          <div class="pipeline-stage process">
+            <div class="process-node" data-detail="detail-process">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"
+                />
+              </svg>
+              Merge &amp;<br />Clean
+            </div>
+            <div
+              class="card-meta"
+              style="
+                text-align: center;
+                margin-top: 6px;
+                font-size: 0.65rem;
+                color: #6b7f5a;
+              "
+            >
+              Click to see details
+            </div>
+          </div>
+
+          <!-- Arrows right -->
+          <div class="pipeline-arrows">
+            <svg viewBox="0 0 40 100" preserveAspectRatio="none">
+              <path
+                d="M0,50 L32,50"
+                stroke="#bdd373"
+                stroke-width="2"
+                fill="none"
+                opacity="0.5"
+              />
+              <polygon
+                points="30,46 40,50 30,54"
+                fill="#bdd373"
+                opacity="0.6"
+              />
+            </svg>
+          </div>
+
+          <!-- Result -->
+          <div class="pipeline-stage result">
+            <div class="result-card">
+              <div class="card-title">Master Dataset</div>
+              <div class="stat">19</div>
+              <div class="card-meta">variables</div>
+              <div class="card-meta" style="margin-top: 6px">
+                200 countries &middot; 1990&ndash;2020<br />Merged on Country
+                &times; Year
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detail panels (revealed on click) -->
+        <div class="pipeline-detail" id="detail-pollutants">
+          <div class="pipeline-detail-inner">
+            <h4>State of Global Air &mdash; Preprocessing</h4>
+            <div class="detail-section">
+              <div
+                style="
+                  font-size: 0.72rem;
+                  color: #6b7f5a;
+                  margin-bottom: 4px;
+                  font-weight: 600;
+                "
+              >
+                Dropped features
+              </div>
+              <div class="dropped-list">
+                <span class="dropped-tag">Exposure Id</span>
+                <span class="dropped-tag">Type</span>
+                <span class="dropped-tag">ISO3</span>
+                <span class="dropped-tag">Region</span>
+                <span class="dropped-tag">Pollutant</span>
+                <span class="dropped-tag">Pollutant Name</span>
+                <span class="dropped-tag">Region Name</span>
+                <span class="dropped-tag">Units</span>
+              </div>
+            </div>
+            <div class="detail-section">
+              <div
+                style="
+                  font-size: 0.72rem;
+                  color: #6b7f5a;
+                  margin-bottom: 4px;
+                  font-weight: 600;
+                "
+              >
+                Retained features
+              </div>
+              <div class="dropped-list">
+                <span class="kept-tag">Country</span>
+                <span class="kept-tag">Region Name</span>
+                <span class="kept-tag">Year</span>
+                <span class="kept-tag">Exposure Mean</span>
+                <span class="kept-tag">Exposure Lower</span>
+                <span class="kept-tag">Exposure Upper</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pipeline-detail" id="detail-deaths">
+          <div class="pipeline-detail-inner">
+            <h4>IHME Death Data &mdash; Preprocessing</h4>
+            <div class="detail-section">
+              <div
+                style="
+                  font-size: 0.72rem;
+                  color: #6b7f5a;
+                  margin-bottom: 4px;
+                  font-weight: 600;
+                "
+              >
+                Dropped features
+              </div>
+              <div class="dropped-list">
+                <span class="dropped-tag">measure_name</span>
+                <span class="dropped-tag">sex_name</span>
+                <span class="dropped-tag">age_id</span>
+                <span class="dropped-tag">metric_name</span>
+                <span class="dropped-tag">sex_id</span>
+                <span class="dropped-tag">measure_id</span>
+                <span class="dropped-tag">location_id</span>
+                <span class="dropped-tag">cause_id</span>
+                <span class="dropped-tag">metric_id</span>
+              </div>
+            </div>
+            <div class="detail-section">
+              <div
+                style="
+                  font-size: 0.72rem;
+                  color: #6b7f5a;
+                  margin-bottom: 4px;
+                  font-weight: 600;
+                "
+              >
+                Retained features
+              </div>
+              <div class="dropped-list">
+                <span class="kept-tag">Country</span>
+                <span class="kept-tag">Cause</span>
+                <span class="kept-tag">Year</span>
+                <span class="kept-tag">Deaths</span>
+                <span class="kept-tag">Deaths Upper</span>
+                <span class="kept-tag">Deaths Lower</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pipeline-detail" id="detail-population">
+          <div class="pipeline-detail-inner">
+            <h4>World Bank Population &mdash; Preprocessing</h4>
+            <div class="detail-section">
+              <div
+                style="
+                  font-size: 0.72rem;
+                  color: #6b7f5a;
+                  margin-bottom: 4px;
+                  font-weight: 600;
+                "
+              >
+                Dropped features
+              </div>
+              <div class="dropped-list">
+                <span class="dropped-tag">Country Code</span>
+              </div>
+            </div>
+            <div class="detail-section">
+              <div
+                style="
+                  font-size: 0.72rem;
+                  color: #6b7f5a;
+                  margin-bottom: 4px;
+                  font-weight: 600;
+                "
+              >
+                Retained features
+              </div>
+              <div class="dropped-list">
+                <span class="kept-tag">Country</span>
+                <span class="kept-tag">Year</span>
+                <span class="kept-tag">Population</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pipeline-detail" id="detail-process">
+          <div class="pipeline-detail-inner">
+            <h4>Merge &amp; Clean Process</h4>
+            <div class="detail-section">
+              <div
+                style="
+                  font-size: 0.72rem;
+                  color: #6b7f5a;
+                  margin-bottom: 4px;
+                  font-weight: 600;
+                "
+              >
+                Steps performed
+              </div>
+              <div class="dropped-list">
+                <span class="kept-tag">Harmonise country names</span>
+                <span class="kept-tag">Align to 1990&ndash;2020</span>
+                <span class="kept-tag">Merge on Country &times; Year</span>
+                <span class="kept-tag">Add pollutant suffixes</span>
+                <span class="kept-tag">Validate &mdash; no records lost</span>
+                <span class="kept-tag">Validate &mdash; no new NaNs</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p>
+          The final master dataset contained annual exposure estimates
+          (PM&#8322;.&#8325;, NO&#8322;, O&#8323;, HAP), cause-specific
+          mortality counts, and population sizes for each country between 1990
+          and 2020. This dataset forms the foundation for subsequent exploratory
+          and statistical analysis.
+        </p>
+
+        <table>
+          <caption>
+            Table 3: Summary of final master dataset
+          </caption>
+          <thead>
+            <tr>
+              <th>Variable</th>
+              <th>Type</th>
+              <th>Unit</th>
+              <th>Description</th>
+              <th>Source</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Country</td>
+              <td>String</td>
+              <td>&ndash;</td>
+              <td>Country name (harmonised across datasets)</td>
+              <td>All datasets</td>
+            </tr>
+            <tr>
+              <td>Year</td>
+              <td>Integer</td>
+              <td>Year</td>
+              <td>Calendar year (1990&ndash;2020)</td>
+              <td>All datasets</td>
+            </tr>
+            <tr>
+              <td>Population</td>
+              <td>Integer</td>
+              <td>Persons</td>
+              <td>Mid-year population estimate</td>
+              <td>World Bank</td>
+            </tr>
+            <tr>
+              <td>Exposure Mean PM&#8322;.&#8325;</td>
+              <td>Float</td>
+              <td>&mu;g/m&sup3;</td>
+              <td>Annual mean PM&#8322;.&#8325; exposure</td>
+              <td>State of Global Air</td>
+            </tr>
+            <tr>
+              <td>Exposure Lower PM&#8322;.&#8325;</td>
+              <td>Float</td>
+              <td>&mu;g/m&sup3;</td>
+              <td>Lower bound (95% CI) for PM&#8322;.&#8325;</td>
+              <td>State of Global Air</td>
+            </tr>
+            <tr>
+              <td>Exposure Upper PM&#8322;.&#8325;</td>
+              <td>Float</td>
+              <td>&mu;g/m&sup3;</td>
+              <td>Upper bound (95% CI) for PM&#8322;.&#8325;</td>
+              <td>State of Global Air</td>
+            </tr>
+            <tr>
+              <td>Exposure Mean NO&#8322;</td>
+              <td>Float</td>
+              <td>ppb</td>
+              <td>Annual mean NO&#8322; exposure</td>
+              <td>State of Global Air</td>
+            </tr>
+            <tr>
+              <td>Exposure Lower NO&#8322;</td>
+              <td>Float</td>
+              <td>ppb</td>
+              <td>Lower bound (95% CI) for NO&#8322;</td>
+              <td>State of Global Air</td>
+            </tr>
+            <tr>
+              <td>Exposure Upper NO&#8322;</td>
+              <td>Float</td>
+              <td>ppb</td>
+              <td>Upper bound (95% CI) for NO&#8322;</td>
+              <td>State of Global Air</td>
+            </tr>
+            <tr>
+              <td>Exposure Mean O&#8323;</td>
+              <td>Float</td>
+              <td>ppb</td>
+              <td>Annual mean O&#8323; exposure</td>
+              <td>State of Global Air</td>
+            </tr>
+            <tr>
+              <td>Exposure Lower O&#8323;</td>
+              <td>Float</td>
+              <td>ppb</td>
+              <td>Lower bound (95% CI) for O&#8323;</td>
+              <td>State of Global Air</td>
+            </tr>
+            <tr>
+              <td>Exposure Upper O&#8323;</td>
+              <td>Float</td>
+              <td>ppb</td>
+              <td>Upper bound (95% CI) for O&#8323;</td>
+              <td>State of Global Air</td>
+            </tr>
+            <tr>
+              <td>Exposure Mean HAP</td>
+              <td>Float</td>
+              <td>&mu;g/m&sup3;</td>
+              <td>Annual mean Household Air Pollution exposure</td>
+              <td>State of Global Air</td>
+            </tr>
+            <tr>
+              <td>Exposure Lower HAP</td>
+              <td>Float</td>
+              <td>&mu;g/m&sup3;</td>
+              <td>Lower bound (95% CI) for HAP</td>
+              <td>State of Global Air</td>
+            </tr>
+            <tr>
+              <td>Exposure Upper HAP</td>
+              <td>Float</td>
+              <td>&mu;g/m&sup3;</td>
+              <td>Upper bound (95% CI) for HAP</td>
+              <td>State of Global Air</td>
+            </tr>
+            <tr>
+              <td>Cause</td>
+              <td>String</td>
+              <td>&ndash;</td>
+              <td>Cause of death (as per IHME GBD coding)</td>
+              <td>IHME GBD</td>
+            </tr>
+            <tr>
+              <td>Deaths</td>
+              <td>Integer</td>
+              <td>Counts</td>
+              <td>Central estimate of death counts</td>
+              <td>IHME GBD</td>
+            </tr>
+            <tr>
+              <td>Deaths Lower</td>
+              <td>Integer</td>
+              <td>Counts</td>
+              <td>Lower bound (95% CI) of deaths</td>
+              <td>IHME GBD</td>
+            </tr>
+            <tr>
+              <td>Deaths Upper</td>
+              <td>Integer</td>
+              <td>Counts</td>
+              <td>Upper bound (95% CI) of deaths</td>
+              <td>IHME GBD</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="feature-engineering" class="page">
+        <h1>Feature Engineering</h1>
+        <p>
+          In this section, we develop a set of quantitative measures to evaluate
+          global air pollution exposure and its human impact. These formulas
+          capture different dimensions of the problem: from population-weighted
+          exposure levels and indexed trends to combined pollution indices,
+          total human impact, and weighted correlations between pollutants.
+          Together, they provide a consistent framework for comparing exposures
+          across countries, pollutants, and years, while ensuring that results
+          reflect real population sizes and global health relevance.
+        </p>
+
+        <h2>4.1 &nbsp; Global Population-Weighted Exposure</h2>
+        <h3>Definition</h3>
+        <p>
+          A measure of the average pollutant exposure for the global population
+          in a given year, weighting each country's exposure by its population
+          size.
+        </p>
+        <div class="formula-block">
+          <div class="formula-label">Formula</div>
+          $$\text{Exposure}_{\text{PW}} = \frac{\displaystyle\sum_{c}
+          \text{Exposure}_{c} \times
+          \text{Population}_{c}}{\displaystyle\sum_{c} \text{Population}_{c}}$$
+        </div>
+        <h3>Purpose</h3>
+        <p>
+          Ensures global averages reflect population size. Larger populations
+          influence the global mean more than smaller ones, giving a realistic
+          measure of worldwide exposure.
+        </p>
+
+        <h2>4.2 &nbsp; Combined Pollution Index (CPI)</h2>
+        <h3>Definition</h3>
+        <p>
+          The CPI aggregates multiple pollutants into a single score, making
+          them comparable by normalization. It reflects the overall pollution
+          burden across pollutants.
+        </p>
+        <div class="formula-block">
+          <div class="formula-label">Formula</div>
+          <div class="formula-step">
+            Step 1: Min-max normalization of each pollutant to [0, 1]
+          </div>
+          $$X_{\text{norm}}(c, y, p) = \frac{X(c, y, p) - \min_{c', y'} X(c',
+          y', p)}{\max_{c', y'} X(c', y', p) - \min_{c', y'} X(c', y', p)}$$
+          <div class="formula-step">
+            Step 2: Summation across all pollutants, giving CPI in range [0, 4]
+          </div>
+          $$\text{CPI}(c, y) = \sum_{p \in P} X_{\text{norm}}(c, y, p)$$
+        </div>
+        <h3>Purpose</h3>
+        <p>
+          Provides a dimensionless, comparable score across pollutants.
+          Countries with high exposure to multiple pollutants score higher,
+          highlighting the overall pollution burden instead of focusing on one
+          pollutant.
+        </p>
+
+        <h2>4.3 &nbsp; Pollution Burden (Total Human Impact)</h2>
+        <h3>Definition</h3>
+        <p>
+          Total Human Impact measures the overall pollution burden on a
+          country's population. It combines pollution intensity (CPI) with
+          population size, showing both how polluted a country is and how many
+          people are affected.
+        </p>
+        <div class="formula-block">
+          <div class="formula-label">Formula</div>
+          <div class="formula-step">
+            Step 1: Multiply CPI with population size
+          </div>
+          $$\text{TotalPollutionBurden}_{c,y} = \text{CPI}_{c,y} \times
+          \text{Population}_{c,y}$$
+          <div class="formula-step">
+            Step 2: Log transformation to reduce skew from large populations
+          </div>
+          $$L_{c,y} = \log\!\left(1 + \text{TotalPollutionBurden}_{c,y}\right)$$
+          <div class="formula-step">Step 3: Min-max scaling to [0, 100]</div>
+          $$\text{ScaledPollutionBurden}_{c,y} = \frac{L_{c,y} -
+          \min_{c',y'}\!(L_{c',y'})}{\max_{c',y'}\!(L_{c',y'}) -
+          \min_{c',y'}\!(L_{c',y'})} \times 100$$
+        </div>
+        <h3>Purpose</h3>
+        <p>
+          Captures the true human burden of pollution by including both
+          intensity and population. Log-scaling reduces skew from very large
+          countries (e.g., China, India), and normalization makes results
+          comparable across countries and years.
+        </p>
+        <ul>
+          <li>
+            <strong>100:</strong> country with maximum global impact (after
+            log-scaling)
+          </li>
+          <li><strong>0:</strong> country with minimum global impact</li>
+          <li><strong>50:</strong> median global impact after scaling</li>
+          <li>
+            Log-scaling reduces extreme outliers while keeping comparisons
+            meaningful.
+          </li>
+        </ul>
+
+        <h2>4.4 &nbsp; Weighted Pearson Correlation</h2>
+        <h3>Definition</h3>
+        <p>
+          The weighted Pearson correlation measures the linear relationship
+          between two variables when each observation has a weight. Here, each
+          country-year is weighted by its population, so the correlation
+          reflects the relationship as experienced by the average person, not
+          the average country.
+        </p>
+        <ul>
+          <li>\(w_i\): weight (population of country \(i\))</li>
+          <li>\(x_i, y_i\): exposure values for two pollutants</li>
+          <li>\(\mu_x, \mu_y\): weighted means of \(x\) and \(y\)</li>
+        </ul>
+        <div class="formula-block">
+          <div class="formula-label">Step 1: Weighted Mean</div>
+          $$\mu_x = \frac{\sum_i w_i \, x_i}{\sum_i w_i} \qquad \mu_y =
+          \frac{\sum_i w_i \, y_i}{\sum_i w_i}$$
+          <p style="font-size: 0.85rem; color: #475569; margin-top: 0.4rem">
+            Represents the average value, adjusted for population size.
+          </p>
+        </div>
+        <div class="formula-block">
+          <div class="formula-label">
+            Step 2: Weighted Variance &amp; Covariance
+          </div>
+          $$\text{var}_w(x) = \frac{\sum_i w_i\,(x_i - \mu_x)^2}{\sum_i w_i}$$
+          $$\text{cov}_w(x, y) = \frac{\sum_i w_i\,(x_i - \mu_x)(y_i -
+          \mu_y)}{\sum_i w_i}$$
+        </div>
+        <div class="formula-block">
+          <div class="formula-label">Step 3: Weighted Pearson Correlation</div>
+          $$\rho_w = \frac{\text{cov}_w(x, y)}{\sqrt{\text{var}_w(x) \cdot
+          \text{var}_w(y)}}$$
+        </div>
+        <div class="formula-block">
+          <div class="formula-label">Fully Substituted Formula</div>
+          $$\rho_w = \frac{\displaystyle\sum_i w_i\,(x_i - \mu_x)(y_i -
+          \mu_y)}{\sqrt{\displaystyle\sum_i w_i\,(x_i - \mu_x)^2} \;\cdot\;
+          \sqrt{\displaystyle\sum_i w_i\,(y_i - \mu_y)^2}}$$
+          <p style="font-size: 0.85rem; color: #475569; margin-top: 0.5rem">
+            Reduces to standard Pearson correlation if all \(w_i\) are equal.
+          </p>
+        </div>
+        <h3>Purpose</h3>
+        <p>
+          Weighted correlation ensures larger populations influence results more
+          than small ones, making it representative of real human exposure.
+        </p>
+        <ul>
+          <li>
+            <strong>If unweighted:</strong> each country contributes equally,
+            regardless of population size.
+          </li>
+          <li>
+            <strong>If weighted:</strong> larger countries contribute more,
+            reflecting global experience more accurately.
+          </li>
+        </ul>
+      </section>
+
+      <section id="analysis" class="page">
+        <h1>Analysis</h1>
+        <p>
+          As the world has industrialized and urbanized over the past three
+          decades, a fundamental question to assess is: Are we winning or losing
+          the battle against air pollution? While headlines often focus on
+          individual cities or dramatic events, the global picture requires a
+          data-driven lens to understand the complex relationship between
+          pollution exposure, population dynamics and human health outcomes.
+          This analysis employs population weighted metrics rather than simple
+          country averages which is a crucial methodological choice that ensures
+          our insights reflect human impact, not just geography. When we say
+          "global air quality is improving" we mean the average person's
+          exposure is declining, not just that more countries happen to have
+          better air. The answers we uncover will inform billions of dollars in
+          public health investments and policy decisions affecting billions of
+          lives. By the end of this analysis, we'll know not just whether air
+          quality is improving globally but where progress is happening, what
+          drives it and how it translates into human health outcomes.
+        </p>
+      </section>
+
+      <section id="analysis-pollutants" class="page">
+        <h1>Analysis — Pollutants</h1>
+        <h2>5.1 &nbsp; Pollutants</h2>
+
+        <h3>5.1.1 &nbsp; Global Pollutants at a Glance</h3>
+        <p>
+          To start with, we can see through three decades of global air quality
+          data and answer that after three decades of environmental policies,
+          economic development and technological innovation, is the world's air
+          getting cleaner or dirtier?
+        </p>
+        <p>
+          Upon analysing, we figured out that it's not straightforward because
+          different pollutants tell different stories. Success with one
+          pollutant doesn't guarantee success with others. We computed a
+          <span
+            class="formula-tooltip"
+            data-formula-label="Population-Weighted Exposure"
+            data-formula="\text{Exposure}_{\text{PW}} = \frac{\sum_{c} \text{Exposure}_{c} \times \text{Pop}_{c}}{\sum_{c} \text{Pop}_{c}}"
+            data-formula-def="Average pollutant exposure weighted by each country's population size."
+            data-formula-where="c = country &middot; Exposure = pollutant concentration &middot; Pop = population"
+            >population weighted global average index</span
+          >
+          of pollutant while considering 1990 as baseline and concluded that
+          three pollutants improved dramatically while Ozone worsens, revealing
+          the chemical complexity of air quality management.
+        </p>
+
+        <figure class="figure float-right">
+          <img
+            src="images/plot1.png"
+            alt="Global Population-Weighted Exposure for HAP, NO2, PM2.5 and Ozone"
+          />
+          <figcaption>
+            Figure 1. Global Population-Weighted Exposure (HAP, NO&#8322;,
+            PM&#8322;.&#8325; and O&#8323;)
+          </figcaption>
+        </figure>
+
+        <p>
+          From the table below, we can see that HAP represents public health's
+          greatest victories with a 36% decline showing that hundreds of
+          millions gained access to clean cooking fuels. It can be driven by
+          rural electrification, LPG subsidies such as India's Ujjwala Yojana
+          (PMUY &amp; Wikipedia, 2016) and other economic developments. The
+          deadliest air pollutant PM&#8322;.&#8325; also declined 21% which
+          reflects successful implementation of air quality standards,
+          industrial controls, and better urban planning. Another important
+          pollutant majorly caused by transportation and vehicle emissions is
+          NO&#8322; which declined about 18% which can be based on initiatives
+          like strict Euro standards and Clean Air Act (Castellanos &amp;
+          Boersma, 2012) (Krotkov, et al., 2017). Another factor can be increase
+          in the use of electric vehicles (Chang, Huang, &amp; Chaveste, 2023).
+        </p>
+
+        <table>
+          <caption>
+            Table 4: Change of Pollutants over time
+          </caption>
+          <thead>
+            <tr>
+              <th>Pollutant</th>
+              <th>Percentage Change</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>HAP</td>
+              <td style="color: #2e7d32">-36.34%</td>
+            </tr>
+            <tr>
+              <td>NO&#8322;</td>
+              <td style="color: #2e7d32">-17.75%</td>
+            </tr>
+            <tr>
+              <td>PM&#8322;.&#8325;</td>
+              <td style="color: #2e7d32">-21.02%</td>
+            </tr>
+            <tr>
+              <td>O&#8323;</td>
+              <td style="color: #c62828">+13.51%</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>
+          We saw a global trend of pollutants which motivates us to drilling
+          into geographical aspects to explain these trends better. To
+          investigate the trends of pollutants, it's best to see the most
+          populous countries and their individual trends. The approach to weight
+          by population is important since a 1% improvement in China affects 14
+          million people and in contrast a 10% improvement in Iceland would only
+          affect 37,000 people.
+        </p>
+
+        <figure class="figure-grid">
+          <img
+            src="images/plot2.png"
+            alt="Percentage Change in PM2.5 (1990 to 2020)"
+          />
+          <img
+            src="images/plot3.png"
+            alt="Percentage Change in Ozone (1990 to 2020)"
+          />
+          <img
+            src="images/plot4.png"
+            alt="Percentage Change in Household Air Pollution (1990 to 2020)"
+          />
+          <img
+            src="images/plot5.png"
+            alt="Percentage Change in NO2 (1990 to 2020)"
+          />
+          <figcaption>
+            Figure 2. Rate of change of pollutants across most populous
+            countries
+          </figcaption>
+        </figure>
+
+        <h3>Particulate Matter 2.5</h3>
+        <p>
+          We can see difference in trends for different pollutants from the
+          above figures. The global PM&#8322;.&#8325; shows a slight increase in
+          early 2000s before a sharp drop after 2013 (shown in Figure 1). The
+          initial bump corresponds to surging industrial growth and pollution in
+          rapidly developing nations (particularly in Asia), followed by
+          improvements as pollution control measures took effect. Seeing Figure
+          2, we can see that all top 10 populous countries showed
+          PM&#8322;.&#8325; reductions from 1990 to 2020. Notably, China's
+          aggressive air quality policies in the 2010s including the "Air
+          Pollution Prevention and Control Action Plan" of 2013 likely
+          contributed to the post-2013 global PM&#8322;.&#8325; decline. Based
+          on our data, China's average PM&#8322;.&#8325; exposure fell from 49.3
+          to 34.8 &mu;g/m&sup3; resulting in a 29.4% decrease. While all
+          countries showed PM&#8322;.&#8325; reductions from 1990 to 2020, it's
+          important to note that current levels in many countries still vastly
+          exceed the WHO guideline of 5 &mu;g/m&sup3;.
+        </p>
+
+        <h3>Ozone</h3>
+        <p>
+          The global Ozone trend reveals a different pattern compared to other
+          pollutants. Unlike others which showed significant improvements, Ozone
+          levels have remained relatively upward. Ozone is a secondary pollutant
+          formed through complex photochemical reactions involving precursor
+          emissions (NO&#8339; and VOCs) and influenced by temperature and
+          sunlight intensity. Countries in Asia like Bangladesh, India,
+          Indonesia, Pakistan &amp; China notably contributed in ozone. The
+          cause can be rising temperature due to climate change or increased
+          urbanization and motorization in developing countries leading to
+          higher NO&#8339; and VOC emissions.
+        </p>
+
+        <h3>Nitrogen Dioxide</h3>
+        <p>
+          Unlike PM&#8322;.&#8325; which showed moderate overall decline, and
+          unlike ozone which showed consistent increases, NO&#8322; demonstrates
+          a more complex pattern with a relatively stable period in the 1990s, a
+          notable peak around 2005&ndash;2010 and a significant decline after
+          2010. The peak period corresponds to rapid industrialization in
+          developing countries, particularly in Asia while the post-2010 decline
+          likely reflects the impact of:
+        </p>
+        <ol>
+          <li>Stricter vehicle emission standards (Euro 6, Tier 3, etc.)</li>
+          <li>
+            Increased adoption of catalytic converters and NO&#8339; reduction
+            technologies
+          </li>
+          <li>
+            Shifts toward cleaner fuels and renewable energy in power generation
+          </li>
+          <li>Targeted urban air quality management in major cities</li>
+        </ol>
+        <p>
+          We see Bangladesh, India &amp; Indonesia having substantial
+          deterioration in NO&#8322; levels which highlights how economic
+          development pathways and regulatory approaches strongly influence air
+          quality outcomes, with NO&#8322; reductions being most challenging in
+          rapidly urbanizing regions and increasing vehicle fleets.
+        </p>
+
+        <h3>Household Air Pollution</h3>
+        <p>
+          The global household air pollution trend reveals a steady decline over
+          the past three decades, indicating substantial progress in reducing
+          indoor air pollution worldwide with Brazil having the largest
+          percentage reduction. This decreasing trend is particularly
+          significant in high income countries through access to clean cooking
+          and electricity thus, HAP primarily affects rural and low-income
+          populations.
+        </p>
+
+        <div class="table-grid-caption">
+          Table 5: Absolute change of Pollutants across most populous countries
+        </div>
+        <div class="table-grid">
+          <!-- NO2 -->
+          <div class="grid-cell">
+            <div class="grid-cell-header">NO&#8322;</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Country</th>
+                  <th>1990</th>
+                  <th>2020</th>
+                  <th>Percentage</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>USA</td>
+                  <td>33.30</td>
+                  <td>14.50</td>
+                  <td style="color: #2e7d32">-56.456456</td>
+                </tr>
+                <tr>
+                  <td>Russia</td>
+                  <td>26.60</td>
+                  <td>18.00</td>
+                  <td style="color: #2e7d32">-32.330827</td>
+                </tr>
+                <tr>
+                  <td>Pakistan</td>
+                  <td>15.70</td>
+                  <td>10.70</td>
+                  <td style="color: #2e7d32">-31.847134</td>
+                </tr>
+                <tr>
+                  <td>Mexico</td>
+                  <td>21.30</td>
+                  <td>16.30</td>
+                  <td style="color: #2e7d32">-23.474178</td>
+                </tr>
+                <tr>
+                  <td>Brazil</td>
+                  <td>14.50</td>
+                  <td>13.80</td>
+                  <td style="color: #2e7d32">-4.827586</td>
+                </tr>
+                <tr>
+                  <td>Nigeria</td>
+                  <td>6.84</td>
+                  <td>6.56</td>
+                  <td style="color: #2e7d32">-4.093567</td>
+                </tr>
+                <tr>
+                  <td>China</td>
+                  <td>13.80</td>
+                  <td>13.60</td>
+                  <td style="color: #2e7d32">-1.449275</td>
+                </tr>
+                <tr>
+                  <td>Indonesia</td>
+                  <td>5.82</td>
+                  <td>6.61</td>
+                  <td style="color: #c62828">13.573883</td>
+                </tr>
+                <tr>
+                  <td>India</td>
+                  <td>8.78</td>
+                  <td>12.10</td>
+                  <td style="color: #c62828">37.813212</td>
+                </tr>
+                <tr>
+                  <td>Bangladesh</td>
+                  <td>6.59</td>
+                  <td>11.50</td>
+                  <td style="color: #c62828">74.506829</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- HAP -->
+          <div class="grid-cell">
+            <div class="grid-cell-header">HAP</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Country</th>
+                  <th>1990</th>
+                  <th>2020</th>
+                  <th>Percentage</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>USA</td>
+                  <td>0.00</td>
+                  <td>0.00</td>
+                  <td>NaN</td>
+                </tr>
+                <tr>
+                  <td>Russia</td>
+                  <td>0.07</td>
+                  <td>0.02</td>
+                  <td style="color: #2e7d32">-71.428571</td>
+                </tr>
+                <tr>
+                  <td>Pakistan</td>
+                  <td>0.83</td>
+                  <td>0.50</td>
+                  <td style="color: #2e7d32">-39.759036</td>
+                </tr>
+                <tr>
+                  <td>Mexico</td>
+                  <td>0.27</td>
+                  <td>0.12</td>
+                  <td style="color: #2e7d32">-55.555556</td>
+                </tr>
+                <tr>
+                  <td>Brazil</td>
+                  <td>0.32</td>
+                  <td>0.07</td>
+                  <td style="color: #2e7d32">-78.125000</td>
+                </tr>
+                <tr>
+                  <td>Nigeria</td>
+                  <td>0.93</td>
+                  <td>0.74</td>
+                  <td style="color: #2e7d32">-20.430108</td>
+                </tr>
+                <tr>
+                  <td>China</td>
+                  <td>0.85</td>
+                  <td>0.30</td>
+                  <td style="color: #2e7d32">-64.705882</td>
+                </tr>
+                <tr>
+                  <td>Indonesia</td>
+                  <td>0.67</td>
+                  <td>0.23</td>
+                  <td style="color: #2e7d32">-65.671642</td>
+                </tr>
+                <tr>
+                  <td>India</td>
+                  <td>0.86</td>
+                  <td>0.60</td>
+                  <td style="color: #2e7d32">-30.232558</td>
+                </tr>
+                <tr>
+                  <td>Bangladesh</td>
+                  <td>0.69</td>
+                  <td>0.73</td>
+                  <td style="color: #c62828">-23.958333</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- Ozone -->
+          <div class="grid-cell">
+            <div class="grid-cell-header">Ozone</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Country</th>
+                  <th>1990</th>
+                  <th>2020</th>
+                  <th>Percentage</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>USA</td>
+                  <td>49.1</td>
+                  <td>43.1</td>
+                  <td style="color: #2e7d32">-12.219959</td>
+                </tr>
+                <tr>
+                  <td>Russia</td>
+                  <td>44.0</td>
+                  <td>35.7</td>
+                  <td style="color: #2e7d32">-18.863636</td>
+                </tr>
+                <tr>
+                  <td>Pakistan</td>
+                  <td>52.3</td>
+                  <td>64.1</td>
+                  <td style="color: #c62828">22.562141</td>
+                </tr>
+                <tr>
+                  <td>Mexico</td>
+                  <td>60.4</td>
+                  <td>42.8</td>
+                  <td style="color: #2e7d32">-29.139073</td>
+                </tr>
+                <tr>
+                  <td>Brazil</td>
+                  <td>32.9</td>
+                  <td>40.5</td>
+                  <td style="color: #c62828">23.100304</td>
+                </tr>
+                <tr>
+                  <td>Nigeria</td>
+                  <td>45.2</td>
+                  <td>53.6</td>
+                  <td style="color: #c62828">18.584071</td>
+                </tr>
+                <tr>
+                  <td>China</td>
+                  <td>46.7</td>
+                  <td>48.4</td>
+                  <td style="color: #c62828">3.640257</td>
+                </tr>
+                <tr>
+                  <td>Indonesia</td>
+                  <td>28.3</td>
+                  <td>38.0</td>
+                  <td style="color: #c62828">34.275618</td>
+                </tr>
+                <tr>
+                  <td>India</td>
+                  <td>48.8</td>
+                  <td>67.2</td>
+                  <td style="color: #c62828">37.704918</td>
+                </tr>
+                <tr>
+                  <td>Bangladesh</td>
+                  <td>47.1</td>
+                  <td>65.4</td>
+                  <td style="color: #c62828">38.853503</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- PM2.5 -->
+          <div class="grid-cell">
+            <div class="grid-cell-header">PM&#8322;.&#8325;</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Country</th>
+                  <th>1990</th>
+                  <th>2020</th>
+                  <th>Percentage</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>USA</td>
+                  <td>14.1</td>
+                  <td>7.81</td>
+                  <td style="color: #2e7d32">-44.609929</td>
+                </tr>
+                <tr>
+                  <td>Russia</td>
+                  <td>25.9</td>
+                  <td>11.30</td>
+                  <td style="color: #2e7d32">-56.370656</td>
+                </tr>
+                <tr>
+                  <td>Pakistan</td>
+                  <td>60.3</td>
+                  <td>43.00</td>
+                  <td style="color: #2e7d32">-28.689884</td>
+                </tr>
+                <tr>
+                  <td>Mexico</td>
+                  <td>32.3</td>
+                  <td>15.00</td>
+                  <td style="color: #2e7d32">-53.560372</td>
+                </tr>
+                <tr>
+                  <td>Brazil</td>
+                  <td>15.4</td>
+                  <td>12.20</td>
+                  <td style="color: #2e7d32">-20.779221</td>
+                </tr>
+                <tr>
+                  <td>Nigeria</td>
+                  <td>65.0</td>
+                  <td>56.50</td>
+                  <td style="color: #2e7d32">-13.076923</td>
+                </tr>
+                <tr>
+                  <td>China</td>
+                  <td>49.3</td>
+                  <td>34.80</td>
+                  <td style="color: #2e7d32">-29.411765</td>
+                </tr>
+                <tr>
+                  <td>Indonesia</td>
+                  <td>29.8</td>
+                  <td>17.90</td>
+                  <td style="color: #2e7d32">-39.932886</td>
+                </tr>
+                <tr>
+                  <td>India</td>
+                  <td>62.0</td>
+                  <td>48.40</td>
+                  <td style="color: #2e7d32">-21.935484</td>
+                </tr>
+                <tr>
+                  <td>Bangladesh</td>
+                  <td>53.2</td>
+                  <td>42.40</td>
+                  <td style="color: #2e7d32">-20.300752</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <p>
+          With this deeper dive into top 10 countries, let's also see how on a
+          global level countries are performing. For that we can plot scatter
+          plots showcasing each country's population and pollutant levels. In
+          each graph, countries are grouped by whether population grew or shrank
+          and whether a pollutant increased or decreased. The shaded quadrants
+          summarize risk typologies:
+        </p>
+        <ol>
+          <li>
+            <strong style="color: #c62828"
+              >Population Increase &amp; Pollutant Increase</strong
+            >
+            (red quadrant) means compounding risk since more people are exposed
+            to worsening air.
+          </li>
+          <li>
+            <strong style="color: #2e7d32"
+              >Population Increase &amp; Pollutant Decrease</strong
+            >
+            (green quadrant) represents the success case which shows growth with
+            cleaner air.
+          </li>
+          <li>
+            <strong style="color: #1565c0"
+              >Population Decrease &amp; Pollutant Decrease</strong
+            >
+            (blue quadrant) is broad improvement, often based on structural
+            shifts or deindustrialization.
+          </li>
+          <li>
+            <strong style="color: #e65100"
+              >Population Decrease &amp; Pollutant Increase</strong
+            >
+            (orange quadrant) is a concerning anomaly with shrinking population
+            but deteriorating air quality.
+          </li>
+        </ol>
+
+        <figure class="figure-grid">
+          <img
+            src="images/plot6.png"
+            alt="Population Change vs PM2.5 Change (1990–2020)"
+          />
+          <img
+            src="images/plot7.png"
+            alt="Population Change vs Ozone Change (1990–2020)"
+          />
+          <img
+            src="images/plot8.png"
+            alt="Population Change vs HAP Change (1990–2020)"
+          />
+          <img
+            src="images/plot9.png"
+            alt="Population Change vs NO2 Change (1990–2020)"
+          />
+          <figcaption>
+            Figure 3. Population change vs pollutant change by country
+            (1990&ndash;2020) with risk quadrants
+          </figcaption>
+        </figure>
+
+        <p>
+          Across all pollutants we can see that the green quadrant has the
+          largest share with PM&#8322;.&#8325; having 118 countries, O&#8323;
+          having 63 countries, NO&#8322; having 102 countries and the largest
+          success story is HAP with 158 countries showcasing clear improvement
+          in the air quality as they grow economically and socially. We can see
+          that HAP shows the most widespread improvements, even in growing
+          populations, likely reflecting successful clean cooking initiatives
+          and energy transitions. PM&#8322;.&#8325; and NO&#8322; show mixed
+          success, with some growing countries improving and others worsening.
+          O&#8323; presents the most challenging pattern with fewer success
+          stories, reflecting its complex atmospheric chemistry.
+        </p>
+        <p>
+          There's also a small but worrying red flag which is the orange
+          quadrant with 4 countries in PM&#8322;.&#8325; category, 5 countries
+          for O&#8323;, 3 countries in NO&#8322; and only 1 country in HAP which
+          suggests possible legacy pollution sources, poor regulations, or
+          specific industrial sectors dominating the economy.
+        </p>
+
+        <h3>5.1.2 &nbsp; Understanding Regional Trends for Pollutants</h3>
+        <p>
+          As far as policy making is concerned, the focus should be in the red
+          quadrant which requires high-priority intervention but to ensure that
+          policy interventions are effective, it is essential to first identify
+          the root causes of air quality deterioration. Pinpointing the exact
+          sources of pollutants allows policymakers to design and implement
+          targeted measures that address the problem at its origin, rather than
+          relying on broad or misaligned solutions. However, the source of
+          pollutants often varies significantly by region. For example, in South
+          Asia, particularly countries like India, air pollution is heavily
+          linked to older vehicles on the road, weak emissions standards, and
+          slower adoption of electric vehicles. In contrast, in regions such as
+          the Amazon basin in Brazil, mass forest fires are the dominant source
+          of pollutants, releasing large amounts of smoke and particulate matter
+          into the atmosphere. Meanwhile, in parts of Sub-Saharan Africa,
+          especially in rapidly industrializing but under-regulated areas, heavy
+          industrial activity and reliance on low-quality fuels are the primary
+          contributors. Since each of these contexts requires a distinct policy
+          response, it becomes critical to analyse pollutants at a more
+          localized, regional level.
+        </p>
+
+        <div style="position: relative">
+          <figure class="figure-grid">
+            <img src="images/plot10.png" alt="Regional trends for PM2.5" />
+            <img src="images/plot11.png" alt="Regional trends for Ozone" />
+            <img src="images/plot12.png" alt="Regional trends for HAP" />
+            <img src="images/plot13.png" alt="Regional trends for NO2" />
+            <figcaption>
+              Figure 4. Regional trends of pollutants across world regions
+            </figcaption>
+          </figure>
+          <img
+            src="images/legend1.png"
+            alt="Region legend"
+            style="
+              position: absolute;
+              top: 10px;
+              right: -140px;
+              width: 120px;
+              opacity: 0.9;
+            "
+          />
+        </div>
+
+        <p>
+          We utilised our canonical region mapping to summarise the granular
+          regional definitions into more generalised regions and computed the
+          change of all pollutants across regions. Where the bubble colour is
+          region coded, the size of bubble is its population and the position is
+          based on its pollutant exposure in 1990 (x-axis) and 2020 (y-axis)
+          such that, every bubble below the parity explains improvement in the
+          air quality, and every bubble above the parity line explains the
+          deterioration of air quality with respect to every pollutant.
+        </p>
+
+        <h3>Africa</h3>
+        <p>
+          In almost every pollutant, African regions are clustered above parity
+          with worrying bubbles. The increase of PM&#8322;.&#8325; &amp;
+          NO&#8322; is worsening due to rapid urbanization, industrial growth,
+          weak emission standards, and reliance on low quality fuels. The
+          O&#8323; can be linked to more vehicles and unchecked NO&#8339;/VOCs.
+          It tells the policymakers that Africa is at a tipping point. Without
+          proactive regulations, worsening air pollution will severely affect
+          rapidly urbanizing populations. Investments in clean transport, fuels,
+          and industrial emissions standards is urgent.
+        </p>
+
+        <h3>Asia</h3>
+        <p>
+          Its real reduction despite growth is driven by China's clean air
+          reforms and India's gradual vehicle standards. Asia is a proof that
+          improvement is possible even with massive population and economic
+          growth. Replicating China's regulatory playbook could accelerate gains
+          elsewhere. However, it is worth noting that the indexes are far beyond
+          WHO guidelines and still need quite a lot of improvement.
+        </p>
+
+        <h3>Europe &amp; Americas</h3>
+        <p>
+          Europe and Americas consistently stayed below parity, with levels that
+          were already close to WHO limits in 1990 showcasing that economically
+          developed countries provides resources for regulations and
+          precautions. Europe and Americas show that long-term regulatory
+          consistency like air quality policies, vehicle standards, and
+          industrial regulation worked. These can serve as models for other
+          regions.
+        </p>
+
+        <h3>MENA</h3>
+        <p>
+          Some wealthy Gulf states improving, while others worsening due to oil
+          combustion, motorization and dust storms. Ozone in MENA is variable
+          but trending higher in majority of areas. MENA is a divided picture:
+          richer economies clean faster while others lag.
+        </p>
+
+        <h3>Oceania</h3>
+        <p>
+          For Oceania, PM&#8322;.&#8325;, NO&#8322; and HAPs were mostly low to
+          begin with, with modest further reductions. However, O&#8323;
+          fluctuations tied more to natural conditions and imported pollution
+          than local sources. Oceania generally performs well benefiting from
+          lower industrialization and stricter environmental regimes.
+        </p>
+
+        <h3>5.1.3 &nbsp; Diving into Countries</h3>
+
+        <div class="figure-stack-right">
+          <figure class="stack-item">
+            <img src="images/1990.png" alt="CPI Choropleth 1990" />
+            <figcaption>1990</figcaption>
+          </figure>
+          <figure class="stack-item">
+            <img src="images/2000.png" alt="CPI Choropleth 2000" />
+            <figcaption>2000</figcaption>
+          </figure>
+          <figure class="stack-item">
+            <img src="images/2010.png" alt="CPI Choropleth 2010" />
+            <figcaption>2010</figcaption>
+          </figure>
+          <figure class="stack-item">
+            <img src="images/2020.png" alt="CPI Choropleth 2020" />
+            <figcaption>2020</figcaption>
+          </figure>
+        </div>
+
+        <p>
+          With all the discussion in mind, a clear snapshot of how pollutants
+          behaved over three decades on a more granular level would make it
+          clearer. An interactive plot with ability to hover and select each
+          country to find exact indexes and details is available in the Jupyter
+          notebook.
+        </p>
+        <p>
+          We calculated the
+          <strong
+            ><span
+              class="formula-tooltip"
+              data-formula-label="Combined Pollution Index"
+              data-formula="\text{CPI}(c, y) = \sum_{p} X_{\text{norm}}(c, y, p)"
+              data-formula-def="Single score aggregating normalized levels of all pollutants."
+              data-formula-where="c = country &middot; y = year &middot; p = pollutant &middot; X&#8345;&#8338;&#8355;&#8344; = min-max normalized value"
+              >Combined Pollution Index (CPI)</span
+            ></strong
+          >
+          by first normalizing the concentration levels of individual pollutants
+          and then aggregating them into a single cumulative score. This
+          composite metric reflects real-world exposure to multiple pollutants
+          simultaneously, providing a more comprehensive basis for assessing
+          potential health risks. Unlike single-pollutant analyses, which may
+          obscure interactions and overlapping effects, the
+          <strong>CPI</strong> highlights patterns and cumulative impacts that
+          are otherwise invisible, offering a more authentic representation of
+          environmental health hazards.
+        </p>
+        <p>
+          From this we can see that, <strong>South Asia</strong> consistently
+          ranks highest with maximum CPI as compared to the world with countries
+          like India, Pakistan, Bangladesh maintaining levels well above WHO
+          limits. On the other hand, the very neighbouring
+          <strong>East Asia</strong>, notably China shows a clear improvement
+          keeping in mind that it's still above WHO limits but they still showed
+          massive improvements in these three decades.
+        </p>
+        <p>
+          <strong>Sub-Saharan Africa</strong> emerges as a growing concern with
+          several countries showing sustained high levels particularly in
+          <strong>West Africa</strong>, more specifically Nigeria.
+        </p>
+        <p>
+          Again, as mentioned earlier <strong>Europe</strong> and
+          <strong>North America</strong> display the most dramatic improvements.
+          We can notice USA, Canada, Mexico and many others transitioning from
+          yellow-orange to green-yellow, reflecting decades of environmental
+          regulations.
+        </p>
+        <p>
+          <strong>Australia</strong>, <strong>Greenland</strong> &amp; parts of
+          <strong>South America</strong> maintain relatively low levels
+          throughout the period.
+        </p>
+        <p>
+          This visualization starkly illustrates that air pollution is not just
+          an environmental issue, it's an equity issue. While wealthy nations
+          have largely solved their air pollution problems, billions of people
+          in developing countries continue to breathe air that far exceeds safe
+          levels. The burden falls disproportionately on the most vulnerable
+          communities, children, the elderly, and those with limited access to
+          healthcare exacerbating cycles of poverty and ill health. This
+          contrast highlights a global imbalance: the technologies, policies,
+          and resources that made clean air possible in wealthier countries
+          remain out of reach for much of the world. Addressing air pollution,
+          therefore, is not only about protecting the planet, but also about
+          ensuring fairness, justice, and the right to breathe clean air for
+          all.
+        </p>
+        <p>
+          Since the
+          <strong
+            ><span
+              class="formula-tooltip"
+              data-formula-label="Combined Pollution Index"
+              data-formula="\text{CPI}(c, y) = \sum_{p} X_{\text{norm}}(c, y, p)"
+              data-formula-def="Single score aggregating normalized levels of all pollutants."
+              data-formula-where="c = country &middot; y = year &middot; p = pollutant &middot; X&#8345;&#8338;&#8355;&#8344; = min-max normalized value"
+              >Combined Pollution Index (CPI)</span
+            ></strong
+          >
+          serves as an aggregate measure of overall air pollution, capturing the
+          cumulative exposure to multiple pollutants within a given country.
+          Accordingly, Table 6 presents the ten countries with the highest CPI
+          values, representing the most severely polluted nations in terms of
+          combined air quality degradation. These rankings highlight the
+          countries experiencing the greatest cumulative pollution exposure,
+          underscoring the urgency for targeted interventions and stricter
+          environmental management policies.
+        </p>
+
+        <table>
+          <caption>
+            Table 6: Top 10 Countries by Combined Pollution Index (CPI)
+          </caption>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Country</th>
+              <th>CPI</th>
+              <th>PM2.5</th>
+              <th>NO&#8322;</th>
+              <th>O&#8323;</th>
+              <th>HAP</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Niger</td>
+              <td>2.56</td>
+              <td>85.1</td>
+              <td>5.6</td>
+              <td>48.6</td>
+              <td>1.0</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Qatar</td>
+              <td>2.37</td>
+              <td>75.7</td>
+              <td>28.9</td>
+              <td>67.6</td>
+              <td>0.0</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Bangladesh</td>
+              <td>2.32</td>
+              <td>42.4</td>
+              <td>11.5</td>
+              <td>65.4</td>
+              <td>0.7</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>India</td>
+              <td>2.30</td>
+              <td>48.4</td>
+              <td>12.1</td>
+              <td>67.2</td>
+              <td>0.6</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>Nepal</td>
+              <td>2.28</td>
+              <td>45.7</td>
+              <td>9.2</td>
+              <td>67.5</td>
+              <td>0.7</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>Mali</td>
+              <td>2.25</td>
+              <td>56.8</td>
+              <td>6.8</td>
+              <td>45.4</td>
+              <td>1.0</td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td>Benin</td>
+              <td>2.24</td>
+              <td>51.0</td>
+              <td>4.7</td>
+              <td>53.5</td>
+              <td>0.9</td>
+            </tr>
+            <tr>
+              <td>8</td>
+              <td>Burkina Faso</td>
+              <td>2.24</td>
+              <td>58.5</td>
+              <td>5.5</td>
+              <td>47.9</td>
+              <td>0.9</td>
+            </tr>
+            <tr>
+              <td>9</td>
+              <td>Togo</td>
+              <td>2.23</td>
+              <td>51.7</td>
+              <td>5.4</td>
+              <td>53.2</td>
+              <td>0.9</td>
+            </tr>
+            <tr>
+              <td>10</td>
+              <td>Gambia</td>
+              <td>2.23</td>
+              <td>58.4</td>
+              <td>7.4</td>
+              <td>44.3</td>
+              <td>0.9</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>
+          We can see as mentioned above, <strong>Niger</strong> from Africa as
+          of 2020 had worst air quality overall with CPI value of 2.56 followed
+          by <strong>Qatar</strong> whose economy is heavily driven by oil, gas,
+          and petrochemical industries. These emit a wide range of pollutants
+          from fine particulates to NO&#8322; contributing directly to poor air
+          quality. Despite having a stable economy, much of Qatar's energy
+          infrastructure, including desalination facilities and power plants,
+          relies on fossil fuels that release significant emissions. We see in
+          top 10 there is a large portion of <strong>West Africa</strong> with
+          inclusion of <strong>Mali</strong>, <strong>Benin</strong>,
+          <strong>Burkina Faso</strong>, <strong>Togo</strong> &amp;
+          <strong>Gambia</strong>.
+        </p>
+        <p>
+          However, their contribution to global pollution remains relatively
+          small due to their limited population sizes. Ranking countries by
+          pollution intensity alone provides insight into local air quality but
+          does not accurately reflect their global impact. Treating all
+          countries as equal risks overlooking opportunities to address
+          pollution where it affects the most people.
+        </p>
+        <div class="figure float-right">
+          <img
+            src="images/plot14.png"
+            alt="World choropleth of Pollution Burden"
+          />
+          <figcaption>
+            Figure 5. World choropleth of Pollution Burden
+          </figcaption>
+        </div>
+        <p>
+          To address this, we developed an additional metric called
+          <strong
+            ><span
+              class="formula-tooltip"
+              data-formula-label="Pollution Burden"
+              data-formula="\text{Burden} = \frac{\log(1 + \text{CPI} \times \text{Pop}) - \min}{\max - \min} \times 100"
+              data-formula-def="Global impact of a country's pollution on its people, scaled 0–100."
+              data-formula-where="CPI = Combined Pollution Index &middot; Pop = population &middot; log = log1p transform"
+              >Pollution Burden</span
+            ></strong
+          >, which represents the global impact of a country's air pollution on
+          people worldwide. Pollution Burden is calculated as the product of a
+          country's CPI and its population. The resulting values are then
+          transformed using a logarithmic function (log1p) to reduce skewness
+          from highly populated countries. Finally, the values are normalized to
+          a 0–100 scale to improve comparability and interpretability. This
+          metric highlights not only where pollution is most intense but also
+          where it affects the greatest number of people. Table 7 presents the
+          top 10 countries having maximum pollution burden.
+        </p>
+
+        <table>
+          <caption>
+            Table 7: Top 10 Countries by Total Pollution Burden
+          </caption>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Country</th>
+              <th>Pollution Burden</th>
+              <th>Population (M)</th>
+              <th>CPI</th>
+              <th>CPI Rank</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>India</td>
+              <td>100</td>
+              <td>1403</td>
+              <td>2.30</td>
+              <td>4</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>China</td>
+              <td>97.5</td>
+              <td>1411.1</td>
+              <td>1.57</td>
+              <td>52</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Pakistan</td>
+              <td>87.1</td>
+              <td>235</td>
+              <td>2.06</td>
+              <td>20</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Nigeria</td>
+              <td>86.8</td>
+              <td>214</td>
+              <td>2.15</td>
+              <td>11</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>Bangladesh</td>
+              <td>85.6</td>
+              <td>166</td>
+              <td>2.32</td>
+              <td>3</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>USA</td>
+              <td>84.1</td>
+              <td>331.5</td>
+              <td>0.93</td>
+              <td>138</td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td>Indonesia</td>
+              <td>83.2</td>
+              <td>274.8</td>
+              <td>0.99</td>
+              <td>127</td>
+            </tr>
+            <tr>
+              <td>8</td>
+              <td>Ethiopia</td>
+              <td>81.8</td>
+              <td>118.9</td>
+              <td>1.88</td>
+              <td>31</td>
+            </tr>
+            <tr>
+              <td>9</td>
+              <td>Brazil</td>
+              <td>81.3</td>
+              <td>208.6</td>
+              <td>0.99</td>
+              <td>128</td>
+            </tr>
+            <tr>
+              <td>10</td>
+              <td>Congo (Dem Rep)</td>
+              <td>80.4</td>
+              <td>95.9</td>
+              <td>1.89</td>
+              <td>30</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>
+          In this table, top 10 countries account for 64.3% of global pollution
+          burden and 57.0% of global population. Now, it makes more sense that
+          countries like <strong>India</strong>, <strong>China</strong>,
+          <strong>Pakistan</strong>, <strong>Nigeria</strong> &amp;
+          <strong>Bangladesh</strong> which are far away from WHO guidelines and
+          have pollution impact on far greater number of humans than those of
+          which were defined in Table 6. Figure 5 is a snapshot of 2020
+          Pollution Burden per country.
+        </p>
+        <div class="figure float-right">
+          <img
+            src="images/plot15.png"
+            alt="Cross-Pollutant Correlation weighted by Population"
+          />
+          <figcaption>
+            Figure 6. Cross-Pollutant Correlation (Country–Year) — Weighted by
+            Population
+          </figcaption>
+        </div>
+        <p>
+          As mentioned in research gaps, it's very critical to understand the
+          correlation of pollutants with each other, not just that but on a more
+          granular level to understand the relationship between pollutants on
+          regional scale. This would highlight the sources; the key reasons of
+          pollution emission guiding the policy makers to pinpoint the exact
+          reason and make better policies accordingly. Thus, we calculated
+          cross-pollutant correlation by using our
+          <span
+            class="formula-tooltip"
+            data-formula-label="Weighted Pearson Correlation"
+            data-formula="\rho_w = \frac{\sum_i w_i(x_i - \mu_x)(y_i - \mu_y)}{\sqrt{\sum_i w_i(x_i - \mu_x)^2} \cdot \sqrt{\sum_i w_i(y_i - \mu_y)^2}}"
+            data-formula-def="Linear relationship between two pollutants, weighted by population."
+            data-formula-where="w = population weight &middot; x, y = pollutant values &middot; &mu; = weighted mean"
+            >weighted Pearson correlation</span
+          >
+          formula.
+        </p>
+        <p>
+          We firstly calculated the global correlation represented in Figure 6,
+          and then a per-region cross-pollutant correlation shown in Figure 7.
+        </p>
+        <p>
+          PM&#8322;.&#8325; shows very different relationships with other
+          pollutants depending on the region. In <strong>Asia</strong> (r =
+          0.73) and <strong>Europe</strong> (r = 0.48), it has moderate to
+          strong positive correlations with O&#8323;. The reason for this is
+          high O&#8323; levels can boost the formation of secondary particles
+          under hot conditions and in cities with heavy NO&#8339; emissions (He,
+          et al. 2024) (Wang, Zhao, Zhang, &amp; Hu, 2023). In contrast,
+          <strong>Oceania</strong> shows a strong negative correlation (r =
+          &minus;0.90), likely because PM&#8322;.&#8325; contributes to O&#8323;
+          loss through chemical reactions on particle surfaces (Qu, 2023).
+          PM&#8322;.&#8325; also has consistently high correlations with
+          household air pollution (HAP) in most regions (r = 0.56–1.00), since
+          both come from combustion sources. <strong>Africa</strong>, however,
+          shows weaker correlations, suggesting different emission sources.
+          Policies should therefore be adapted. The regions with high
+          PM&#8322;.&#8325; and O&#8323; links, strategies should focus on
+          NO&#8339; and VOC control, while in <strong>Oceania</strong>, reducing
+          particle emissions may be more effective.
+        </p>
+
+        <div class="figure">
+          <img
+            src="images/plot16.png"
+            alt="Per-region cross-pollutant correlation matrices"
+          />
+          <figcaption>
+            Figure 7. Per-region cross-pollutant correlation matrices
+          </figcaption>
+        </div>
+
+        <p>
+          O&#8323; and NO&#8322; correlations reveal differences in chemistry
+          and emissions between regions. In <strong>Africa</strong> (r = 0.30)
+          and <strong>Oceania</strong> (r = 0.82), positive correlations suggest
+          NO&#8339;-limited conditions, where O&#8323; increases with NO&#8322;.
+          In contrast, <strong>Europe</strong> (r = &minus;0.13) and the
+          <strong>Americas</strong> (r = 0.68) show mixed patterns shaped by
+          urban and rural contrasts. Studies also show that PM&#8322;.&#8325;
+          levels in cities are strongly influenced by NO&#8322;, CO, and
+          SO&#8322;, explaining almost half of the total variation (J., 2024).
+          Household emissions worsen the situation as about 2.1 billion people
+          still rely on kerosene, biomass, and coal for cooking, producing HAP
+          that reduces O&#8323; formation (Organisation, 2021). This means
+          O&#8323; control needs to be region-specific. NO&#8339; reduction is
+          key in VOC-limited urban areas, while VOC reduction is more important
+          in NO&#8339;-limited rural areas.
+        </p>
+        <p>
+          NO&#8322; patterns reflect differences in economic development and
+          energy use. In <strong>Africa</strong> (r = &minus;0.78) and the
+          <strong>Middle East/North Africa</strong> (r = &minus;0.67), NO&#8322;
+          has strong negative correlations with HAP, while
+          <strong>Europe</strong> shows only a weak negative link (r =
+          &minus;0.27). This suggests that as economies shift from biomass to
+          fossil fuels, NO&#8322; levels rise even as HAP falls (Hickman, et
+          al., 2021). Africa's unique pattern, where NO&#8322; has only a weak
+          positive link with O&#8323; (r = 0.30) but a strong negative link with
+          HAP, highlights the dominance of biomass burning. Biomass combustion
+          releases PM, NO&#8339;, CO, SO&#8322;, and other hazardous pollutants
+          (Partnership for Policy Integrity, 2021). Correlations between
+          NO&#8322; and PM&#8322;.&#8325; also vary, positive in
+          <strong>Africa</strong> (r = 0.33) and <strong>Europe</strong> (r =
+          0.17), but negative in <strong>Asia</strong> (r = &minus;0.09) and
+          <strong>Oceania</strong> (r = &minus;0.84). These differences show how
+          local weather and chemistry influence secondary particle formation.
+          Policies should therefore promote clean household energy in
+          <strong>Africa</strong> and <strong>MENA</strong> and focus on traffic
+          and industry in more developed regions.
+        </p>
+        <p>
+          <strong>HAP (Household Air Pollution)</strong> correlations highlight
+          the role of energy access. Across regions, HAP is strongly correlated
+          with PM&#8322;.&#8325; (r = 0.56–1.00), confirming that household
+          emissions from solid fuels are a major source of fine particles
+          (Pratiti, 2021). However, its correlations with other pollutants
+          differ. In <strong>Africa</strong>, NO&#8322; and HAP correlations are
+          strongly negative (r = &minus;0.78), while in the
+          <strong>Americas</strong> they are slightly positive (r =
+          &minus;0.30), reflecting different stages of energy transition.
+          Globally, nearly half the population still uses biomass cookstoves,
+          which generate CO, PM&#8322;.&#8325;, and toxic hydrocarbons
+          (Fandi&ntilde;o-Del-Rio, et al., 2020). HAP–O&#8323; correlations are
+          consistently negative, since household emissions usually occur
+          indoors, at night, or in polluted conditions that prevent O&#8323;
+          formation. This shows the urgent need for clean cooking programs in
+          <strong>Africa</strong> and <strong>Asia</strong>, while high-income
+          regions should target the last remaining solid-fuel users in
+          disadvantaged communities.
+        </p>
+      </section>
+
+      <section id="analysis-mortality" class="page">
+        <h1>Analysis — Mortality</h1>
+        <h2>5.2 &nbsp; Mortality</h2>
+        <p>
+          Having explored how pollutant levels such as PM&#8322;.&#8325; and
+          NO&#8322; have changed over the past three decades, it is equally
+          important to examine how mortality has evolved in parallel. This
+          allows us to better understand whether reductions in pollutant
+          exposure have translated into health gains or whether other global
+          forces are shaping mortality patterns.
+        </p>
+        <div class="figure float-right">
+          <img
+            src="images/plot17.png"
+            alt="Global total deaths from all causes (1990–2020)"
+          />
+          <figcaption>
+            Figure 8. Global total deaths from all causes (1990–2020)
+          </figcaption>
+        </div>
+        <p>
+          The first step is to look at total deaths from all causes worldwide.
+          As shown in Figure 8, global deaths have steadily increased from
+          around 57 million in 1990 to more than 83 million in 2020. For most of
+          this period, the increase follows a gradual but steady upward trend.
+          This growth is largely explained by population growth and ageing. As
+          the world's population has increased, and as people are living longer,
+          the number of older adults has grown rapidly. Since older age groups
+          have higher risks of death, this naturally leads to more deaths
+          overall, even though death rates within each age group have generally
+          improved (Cheng, et al., 2020) (Li, Zhou, Wang, &amp; al., 2023). What
+          stands out in the data, however, is the sharp spike in 2020. Unlike
+          the gradual increase of earlier years, this sudden jump is linked to
+          the COVID-19 pandemic, which caused millions of excess deaths
+          worldwide and disrupted normal mortality trends (Msemburi, et al.,
+          2023). This shows how global health shocks, such as pandemics, can
+          abruptly reverse long-term progress in mortality.
+        </p>
+        <div class="figure float-right">
+          <img
+            src="images/plot18.png"
+            alt="Year-on-year change in total deaths (absolute and percentage)"
+          />
+          <figcaption>
+            Figure 9. Year-on-year change in total deaths (1990–2020)
+          </figcaption>
+        </div>
+        <p>
+          To understand this shift more clearly, Figure 9 shows the year-on-year
+          change in deaths, both as absolute numbers and percentage change. From
+          1990 to around 2019, changes are relatively small and stable, with
+          annual increases typically under 2%. This reflects the steady
+          demographic drivers mentioned above. However, in 2020 the trend is
+          broken: total deaths rose by more than six million compared to the
+          previous year, an increase of over 8%. This spike is consistent with
+          global health data showing excess mortality during the pandemic
+          period. These trends show an image of mortality but doesn't really
+          answer a very important question.
+        </p>
+
+        <h3>5.2.1 &nbsp; Is the world growing or dying overall?</h3>
+        <p>
+          To answer this, we calculated
+          <strong
+            ><span
+              class="formula-tooltip"
+              data-formula-label="Crude Death Rate"
+              data-formula="\text{CDR} = 1000 \times \frac{\text{Deaths}}{\text{Population}}"
+              data-formula-def="Number of deaths per 1,000 people in a given country-year."
+              data-formula-where="Deaths = total deaths &middot; Population = country population"
+              >Crude Death Rate (CDR)</span
+            ></strong
+          >
+          — the number of deaths per 1,000 population, normalizing deaths
+          relative to population size for fair comparison across countries. We
+          also calculated
+          <strong
+            ><span
+              class="formula-tooltip"
+              data-formula-label="Population Growth Rate"
+              data-formula="\text{PGR}_{\text{per 1000}} = 10 \times 100 \times \frac{\text{Pop}_{t} - \text{Pop}_{t-1}}{\text{Pop}_{t-1}}"
+              data-formula-def="Year-over-year population growth scaled to per-1,000 units."
+              data-formula-where="Pop&#8346; = population at year t &middot; Pop&#8346;&#8331;&#8321; = previous year"
+              >Population Growth Rate (PGR)</span
+            ></strong
+          >, the year-over-year percentage growth scaled to per-1,000 units for
+          direct comparability with CDR, and then the
+          <strong
+            ><span
+              class="formula-tooltip"
+              data-formula-label="Growth&ndash;Mortality Gap"
+              data-formula="\text{Gap} = \text{PGR}_{\text{per 1000}} - \text{CDR}"
+              data-formula-def="Net balance: is the population growing faster than it's dying?"
+              data-formula-where="PGR = growth rate per 1,000 &middot; CDR = crude death rate &middot; +ve = growing &middot; &minus;ve = shrinking"
+              >Growth–Mortality Gap</span
+            ></strong
+          >
+          between them.
+        </p>
+        <div class="figure">
+          <img
+            src="images/plot19.png"
+            alt="Global CDR vs PGR with Shaded Gap and Trends (1990–2020)"
+          />
+          <figcaption>
+            Figure 10. Global CDR vs PGR with Shaded Gap &amp; Trends
+            (1990–2020)
+          </figcaption>
+        </div>
+        <p>
+          A very concerning insight generated from this graph shows that
+          globally the growth rate of population is decreasing at an alarming
+          trend of &minus;0.18 every year, while the death rate is relatively
+          consistent. We can see that from 1990 to 2020, the gap steadily
+          shrinks toward zero, and by the late 2019 the two curves intersected.
+          This marks the point where net growth effectively reached zero. The
+          sharp rise in deaths during 2020 is largely attributable to the
+          pandemic and can be considered an outlier, but even discounting that
+          anomaly, the underlying trend indicates that population stagnation or
+          decline is no longer a distant possibility but an emerging reality.
+        </p>
+
+        <h4>5.2.1.1 &nbsp; Growth Rates</h4>
+        <div class="figure float-right">
+          <img
+            src="images/plot20.png"
+            alt="Distribution of 30-year average Growth–Mortality Gap"
+          />
+          <figcaption>
+            Figure 11. 30-Year Global Gap Average Distribution
+          </figcaption>
+        </div>
+        <p>
+          To see how the growth rates are fluctuating across the globe and which
+          country is affected the most, we calculated the 30-year average of
+          mortality gap between CDR and PGR, and Figure 11 shows the
+          distribution of gap globally lies at 3.70 which is alarming. To see
+          deeper insights into each country level, Figure 12 shows a world map
+          of this 30-year average gap. Looking at the world map, clear regional
+          patterns emerge in how the population growth and death rate has
+          evolved over the past 30 years.
+        </p>
+        <div class="figure float-right">
+          <img
+            src="images/plot21.png"
+            alt="World map of 30-year average Growth–Mortality Gap"
+          />
+          <figcaption>Figure 12. 30-Year Average Gap World Map</figcaption>
+        </div>
+        <p>
+          In <strong>Africa</strong>, most countries are shaded yellows and
+          greens, indicating that population growth continues to outpace death
+          rates. The <strong>Middle East</strong> shows a similar pattern of
+          resilience. Countries such as <strong>Saudi Arabia</strong>,
+          <strong>Iraq</strong> &amp; <strong>Jordan</strong> are representing
+          green zones. Fertility here has not fallen as sharply as in Europe or
+          East Asia.
+        </p>
+        <p>
+          However a stark contrast is visible in <strong>Europe</strong>, which
+          is dominated by deep reds. These shades reveal regions where deaths
+          now exceed births, which shows a long-term demographic decline.
+          <strong>Eastern Europe</strong> and <strong>Russia</strong> are
+          particularly striking with the strongest negative gaps linked to aging
+          populations, persistently low fertility rates and elevated mortality
+          compared to <strong>Western Europe</strong>.
+        </p>
+        <p>
+          In <strong>Asia</strong>, the patterns diverge sharply between
+          regions. <strong>South Asia</strong> including Pakistan, India &amp;
+          Bangladesh still shows positive zones reflecting modest but positive
+          gaps. However the trajectory is clearly downward.
+          <strong>East Asia</strong> by contrast is marked in reds, reflecting
+          severe demographic challenges faced by <strong>China</strong>,
+          <strong>Japan</strong> and <strong>South Korea</strong>. These
+          countries are already experiencing population shrinkage, driven by a
+          mix of low fertility, rapid aging and rising mortality.
+        </p>
+        <p>
+          Taken together, the map reveals a world divided.
+          <strong>Global North</strong> including Europe, East Asia, North
+          America, and Oceania is already at or near demographic decline, while
+          <strong>Global South</strong> particularly Africa, Middle East &amp;
+          part of South Asia remains in a growth phase.
+        </p>
+
+        <table>
+          <caption>
+            Table 8: Top 10 Countries by Gap
+          </caption>
+          <thead>
+            <tr>
+              <th
+                colspan="2"
+                style="text-align: center; border-right: 2px solid #d0d9c0"
+              >
+                Growing Countries with positive gaps
+              </th>
+              <th colspan="2" style="text-align: center">
+                Shrinking Countries with negative gaps
+              </th>
+            </tr>
+            <tr>
+              <th>Country</th>
+              <th style="border-right: 2px solid #d0d9c0">
+                30 Year Gap Average
+              </th>
+              <th>Country</th>
+              <th>30 Year Gap Average</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Qatar</td>
+              <td style="border-right: 2px solid #d0d9c0">61.73</td>
+              <td>Latvia</td>
+              <td>&minus;30.95</td>
+            </tr>
+            <tr>
+              <td>UAE</td>
+              <td style="border-right: 2px solid #d0d9c0">52.23</td>
+              <td>Bulgaria</td>
+              <td>&minus;29.67</td>
+            </tr>
+            <tr>
+              <td>Equatorial Guinea</td>
+              <td style="border-right: 2px solid #d0d9c0">34.75</td>
+              <td>Serbia</td>
+              <td>&minus;27.35</td>
+            </tr>
+            <tr>
+              <td>Jordan</td>
+              <td style="border-right: 2px solid #d0d9c0">33.76</td>
+              <td>Lithuania</td>
+              <td>&minus;27.28</td>
+            </tr>
+            <tr>
+              <td>Bahrain</td>
+              <td style="border-right: 2px solid #d0d9c0">31.68</td>
+              <td>Georgia</td>
+              <td>&minus;25.07</td>
+            </tr>
+            <tr>
+              <td>Saudi Arabia</td>
+              <td style="border-right: 2px solid #d0d9c0">31.06</td>
+              <td>Croatia</td>
+              <td>&minus;24.78</td>
+            </tr>
+            <tr>
+              <td>Kuwait</td>
+              <td style="border-right: 2px solid #d0d9c0">31.01</td>
+              <td>Republic of Moldova</td>
+              <td>&minus;24.42</td>
+            </tr>
+            <tr>
+              <td>Afghanistan</td>
+              <td style="border-right: 2px solid #d0d9c0">29.90</td>
+              <td>Ukraine</td>
+              <td>&minus;24.10</td>
+            </tr>
+            <tr>
+              <td>Oman</td>
+              <td style="border-right: 2px solid #d0d9c0">28.53</td>
+              <td>Estonia</td>
+              <td>&minus;23.54</td>
+            </tr>
+            <tr>
+              <td>Yemen</td>
+              <td style="border-right: 2px solid #d0d9c0">24.80</td>
+              <td>Romania</td>
+              <td>&minus;23.22</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>5.2.2 &nbsp; What's causing death the most?</h3>
+        <p>
+          Understanding global mortality requires more than counting deaths; it
+          is equally important to visualise the underlying causes and how
+          different diseases contribute to the overall burden. By examining both
+          proportional shares and absolute numbers, we can see not only which
+          conditions dominate worldwide but also how a wider set of causes
+          shapes the mortality landscape.
+        </p>
+        <p>
+          The treemap in Figure 13 presents a proportional view of mortality
+          causes, with each block sized according to its share of global deaths.
+          This allows both leading and smaller contributors to be compared in a
+          single visual.
+        </p>
+        <p>
+          Cancers and ischemic heart disease dominate, occupying the largest
+          spaces and confirming their role as the two leading causes of death
+          worldwide. Other major non-communicable diseases, such as chronic
+          obstructive pulmonary disease (COPD), ischemic stroke, and
+          intracerebral hemorrhage, also feature prominently, underscoring their
+          importance in global health.
+        </p>
+        <p>
+          The treemap also highlights the persistence of communicable diseases
+          such as malaria, measles, and meningitis, which remain significant in
+          low- and middle-income regions where healthcare, sanitation, and
+          vaccination gaps are common. Alongside these, aging-related conditions
+          like Alzheimer's disease and other dementias appear, reflecting
+          demographic shifts in high-income countries.
+        </p>
+        <p>
+          Less frequently discussed causes, including falls, drowning, and
+          neonatal disorders, also stand out in the figure, reminding us that
+          injuries and early-life conditions remain part of the global mortality
+          profile.
+        </p>
+        <p>
+          By showing mortality shares, the treemap complements the following
+          figure, which shifts focus to the absolute number of deaths from the
+          top ten causes worldwide.
+        </p>
+
+        <div class="figure">
+          <img
+            src="images/plot22.png"
+            alt="Treemap of global mortality causes by proportional share"
+          />
+          <figcaption>
+            Figure 13. Proportional share of global mortality causes
+          </figcaption>
+        </div>
+
+        <p>
+          While the treemap illustrated proportional shares, Figure 14 focuses
+          on the absolute number of deaths from the ten leading causes
+          worldwide. The figures are striking: cancers and ischemic heart
+          disease dominate, with approximately 231.6 million and 215.7 million
+          deaths respectively. Together, they demonstrate the growing dominance
+          of non-communicable diseases (NCDs), which the World Health
+          Organization recognises as the primary global health challenge
+          (Organisation, 2021).
+        </p>
+        <p>
+          Other major NCDs also feature prominently. Chronic obstructive
+          pulmonary disease (93.2 million deaths), ischemic stroke (89.4
+          million), and intracerebral hemorrhage (88.2 million) reflect the
+          burden of cardiovascular and respiratory conditions, largely driven by
+          long-term exposures such as smoking, air pollution, and
+          lifestyle-related risk.
+        </p>
+        <p>
+          Among communicable diseases, lower respiratory infections (82.8
+          million deaths), diarrhoeal diseases (63.7 million), and tuberculosis
+          (44.7 million) remain significant. Although lower in total numbers
+          compared to cancers or heart disease, these causes are concentrated in
+          low- and middle-income countries, where gaps in healthcare,
+          sanitation, and vaccination persist (Organisation, 2021).
+        </p>
+        <p>
+          Other causes highlight demographic and environmental shifts.
+          Alzheimer's disease and other dementias (35.8 million deaths) reflect
+          the impact of aging populations, particularly in high-income
+          countries, while tracheal, bronchus, and lung cancer (46.0 million
+          deaths) underscores the combined effects of smoking and environmental
+          exposures.
+        </p>
+        <p>
+          Taken together, Figure 14 reinforces the picture of a dual burden of
+          disease. On one side, NCDs dominate mortality worldwide, especially in
+          developed regions. On the other, communicable diseases, though smaller
+          in share, still claim tens of millions of lives each year in
+          resource-limited settings. This pattern highlights the urgent need for
+          health strategies that reduce chronic, lifestyle-related risks while
+          continuing to address preventable infectious diseases, with the goal
+          of reducing premature mortality and improving global outcomes.
+        </p>
+
+        <div class="figure">
+          <img
+            src="images/plot23.png"
+            alt="Top 10 causes of death worldwide by total deaths"
+          />
+          <figcaption>
+            Figure 14. Top 10 causes of death worldwide (1990–2020)
+          </figcaption>
+        </div>
+
+        <p>
+          Viewed together, the treemap and the top 10 ranking provide
+          complementary perspectives: one reveals the relative shares of diverse
+          causes, while the other underscores the absolute scale of leading
+          killers. Both make clear that the global mortality burden is dominated
+          by non-communicable diseases, but that communicable diseases and other
+          causes remain critical challenges, particularly in low-resource
+          settings.
+        </p>
+      </section>
+
+      <section id="analysis-impact" class="page">
+        <h1>Analysis — Impact of Pollutants on Mortality</h1>
+        <h2>5.3 &nbsp; Impact of Pollutants on Mortality</h2>
+        <p>
+          The analysis of pollutant trends across different regions over the
+          past three decades highlights notable associations with mortality
+          patterns. To assess the extent of this impact, mortality rates were
+          calculated per 100,000 population, and population-weighted
+          correlations between pollutant levels and mortality rates were
+          computed. This approach provides insight into the relative influence
+          of individual pollutants on mortality outcomes and allows
+          identification of specific causes of death most strongly associated
+          with environmental exposures.
+        </p>
+        <p>
+          Table 9 summarizes the number of diseases that exhibit positive
+          correlations with each pollutant across different correlation ranges:
+        </p>
+
+        <table>
+          <caption>
+            Table 9: Number of diseases having positive correlations with
+            pollutants
+          </caption>
+          <thead>
+            <tr>
+              <th>Pollutant</th>
+              <th>0.4 &le; r &lt; 0.5</th>
+              <th>0.5 &le; r &lt; 0.6</th>
+              <th>0.6 &le; r &lt; 0.7</th>
+              <th>0.7 &le; r &lt; 0.8</th>
+              <th>0.8 &le; r &lt; 0.9</th>
+              <th>0.9 &le; r &lt; 1</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>HAP</td>
+              <td>27</td>
+              <td>24</td>
+              <td>6</td>
+              <td>0</td>
+              <td>0</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <td>PM&#8322;.&#8325;</td>
+              <td>10</td>
+              <td>4</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <td>NO&#8322;</td>
+              <td>21</td>
+              <td>17</td>
+              <td>6</td>
+              <td>0</td>
+              <td>0</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <td>O&#8323;</td>
+              <td>1</td>
+              <td>0</td>
+              <td>1</td>
+              <td>0</td>
+              <td>0</td>
+              <td>0</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>
+          As shown, <strong>Household Air Pollution (HAP)</strong> and
+          <strong>Nitrogen Dioxide (NO&#8322;)</strong> exhibit the strongest
+          associations with disease burden, with many causes demonstrating
+          correlations above 0.5. In total, 55 diseases were found to have
+          correlation coefficients exceeding 0.5, suggesting a significant
+          influence of pollutant exposure on mortality. Complete lists of these
+          causes by pollutant are available in the code notebooks, with
+          supporting screenshots provided in the appendix.
+        </p>
+        <p>
+          Further analysis revealed that deaths from these 55 pollutant-linked
+          diseases account for, on average, 36% of total mortality across the
+          three decades under study (Figure 15). This finding underscores the
+          substantial contribution of environmental pollutants to
+          population-level health outcomes and highlights the critical role of
+          pollutant control in reducing premature mortality. Now from these 55
+          significant causes, we've taken top 10 causes per pollutant and
+          filtered our dataframe to perform predictive modelling discussed in
+          the next section.
+        </p>
+
+        <div class="figure">
+          <img
+            src="images/plot24.png"
+            alt="Percentage of deaths related to pollutants (1990–2020)"
+          />
+          <figcaption>
+            Figure 15. Percentage of deaths related to pollutants (1990–2020)
+          </figcaption>
+        </div>
+      </section>
+
+      <section id="predictive-modelling" class="page">
+        <h1>Predictive Modelling</h1>
+        <p>
+          Understanding the relationship between pollutant exposure and
+          mortality rates is crucial for public health policy development,
+          environmental regulations and early warning systems. We created this
+          global dataset and explored key patterns and now this analysis employs
+          a comparative machine learning approach evaluating seven different
+          algorithms ranging from linear models to advanced ensemble methods.
+          The goal is to identify the most effective approach for predicting air
+          pollution-related mortality.
+        </p>
+
+        <h2>6.1 &nbsp; Feature Selection</h2>
+        <h3>Predictors</h3>
+        <p>
+          In the last section, we computed that there are 55 causes which
+          strongly correlate with pollutants having r value greater than 0.5 and
+          from those 55 causes we took top 10 causes per pollutant ultimately
+          resulting in 30 unique causes of deaths. With this selection from the
+          complete dataframe, we were left with 12% of rows (~189,720) but it
+          was much more meaningful since all causes are not related to
+          pollutants, adding those causes would add noise to the dataset. For
+          example, including homicide or accident deaths (which aren't caused by
+          pollution) distracts the model from concentrating on pollution-related
+          mortality only.
+        </p>
+        <p>
+          We dropped columns that won't be used as predictors. We used only the
+          "Mean" exposure values for pollutants and dropped the "Lower"/"Upper"
+          exposure bounds (these are confidence interval limits and are highly
+          correlated with the mean). Keeping only the mean PM&#8322;.&#8325;,
+          NO&#8322;, O&#8323;, and HAP exposures avoids multicollinearity and
+          reduces feature count. Likewise, we dropped "Deaths Lower" and "Deaths
+          Upper" (if those represent uncertainty ranges), since we'll predict
+          the central mortality rate.
+        </p>
+
+        <h3>Target Variable</h3>
+        <p>
+          We ensured the target <strong>Mortality Rate</strong> is computed for
+          each record as: Mortality Rate = (Deaths / Population) &times;
+          100,000. We used this standardized mortality rate as the outcome so
+          that country size is accounted for.
+        </p>
+
+        <h2>6.2 &nbsp; Feature Engineering</h2>
+        <h3>Log Transformation</h3>
+        <p>
+          We applied a logarithmic transform to the mortality rate to handle
+          right-skewed distribution. Death counts and rates can vary widely
+          between countries (large populations) and causes, and a log transform
+          will stabilize variance and normalize the distribution. This often
+          leads to more accurate and robust models by reducing the influence of
+          extreme values.
+        </p>
+        <p>
+          Similarly, we applied log1p to highly skewed input features:
+          population size and pollutant exposure levels. Pollution exposure data
+          (especially PM&#8322;.&#8325; or NO&#8322; concentrations) and
+          population counts usually have long-tailed distributions. Logging
+          these features makes their distributions more Gaussian and linearizes
+          multiplicative relationships, which helps linear models fit better and
+          can improve tree-based model performance as well. For instance, an
+          increase from 10 to 20 &mu;g/m&sup3; PM&#8322;.&#8325; might have a
+          bigger health impact than 0 to 10, and using log emphasizes relative
+          changes.
+        </p>
+
+        <h3>Scaling</h3>
+        <p>
+          After log transformation, the features are more comparable in scale.
+          So, we standardized continuous features especially for
+          linear/ridge/lasso models so that coefficients are on comparable
+          scales. This prevents features with larger numeric ranges from
+          dominating just by scale. Also, since tree-based models are
+          scale-invariant, normalization is less critical for those.
+        </p>
+
+        <h3>Encoding</h3>
+        <p>
+          We implemented one-hot encoding for categorical features like region
+          name and cause of death since most ML models can understand only
+          numerical variables.
+        </p>
+
+        <h2>6.3 &nbsp; Model Selection</h2>
+        <p>
+          A range of models was chosen to balance interpretability, flexibility,
+          and predictive power. Linear models (Linear Regression, Ridge, Lasso)
+          provide a baseline and are easy to interpret but may miss complex
+          relationships. XGBoost and CatBoost are advanced tree-based models
+          known for handling non-linearities and categorical data. Random
+          Forest, an ensemble of decision trees, is robust to overfitting and
+          effective for tabular data with mixed feature types.
+        </p>
+        <ul>
+          <li>Linear Regression</li>
+          <li>Ridge Regression</li>
+          <li>Lasso Regression</li>
+          <li>Random Forest</li>
+          <li>XGBoost (Gradient Boosting)</li>
+          <li>CatBoost</li>
+        </ul>
+
+        <h2>6.4 &nbsp; Comparisons &amp; Results</h2>
+        <div class="figure-grid">
+          <div class="figure">
+            <img src="images/plot25.png" alt="Model Comparison: RMSE vs R²" />
+            <figcaption>
+              Figure 16. Model Comparison: RMSE vs R&sup2;
+            </figcaption>
+          </div>
+          <div class="figure">
+            <img src="images/plot26.png" alt="Model Comparison: R² Score" />
+            <figcaption>Figure 17. Model Comparison: R&sup2; Score</figcaption>
+          </div>
+        </div>
+        <p>
+          The dual-axis plot showing both RMSE and R&sup2; for each model
+          provides a comprehensive view of predictive accuracy and error. The
+          results plots show that <strong>Random Forest</strong> achieved the
+          best performance (lowest RMSE, highest R&sup2;) on the test set. This
+          indicates it captured the underlying patterns in the data more
+          effectively than other models.
+        </p>
+        <p>
+          The Random Forest can be seen to be performing better than the rest of
+          the models because the dataset has nonlinear relationships and Random
+          Forest can model complex, non-linear interactions between pollutants,
+          population, and mortality rates, which linear models cannot. It
+          automatically captures interactions between features (e.g., combined
+          effects of multiple pollutants). Random Forest is less sensitive to
+          outliers and noisy data, which are common in real-world environmental
+          datasets. Unlike boosting models, Random Forest performs well with
+          default settings and is less prone to overfitting. Feature importance
+          scores from Random Forest help identify key drivers of mortality.
+        </p>
+        <p>
+          In summary, Random Forest's flexibility and robustness make it an
+          excellent choice for this predictive task, outperforming both linear
+          and more complex boosting models in this context.
+        </p>
+      </section>
+
+      <section id="conclusion" class="page">
+        <h1>Conclusion</h1>
+        <p>
+          This comprehensive exploratory analysis reveals a world in
+          environmental and demographic transition, where progress in reducing
+          traditional pollutants exists alongside emerging challenges and shows
+          global inequalities. From 1990 to 2020, we observe a remarkable
+          success story in pollution control where
+          <strong>household air pollution decreased by 36%</strong>,
+          <strong>PM&#8322;.&#8325; by 21%</strong>, and
+          <strong>NO&#8322; by 18%</strong> demonstrating that coordinated
+          global efforts can yield significant environmental improvements.
+          However, this progress is overshadowed by the alarming
+          <strong>13.5% increase in ozone levels</strong>, signalling a new
+          frontier in air quality management that requires urgent attention.
+        </p>
+        <p>
+          The geographical distribution of pollution burden reveals a troubling
+          pattern of environmental injustice. While Sub-Saharan African nations
+          like <strong>Niger</strong>, <strong>Mali</strong>, and
+          <strong>Burkina Faso</strong> face the highest pollution intensity per
+          capita, it is the densely populated developing countries
+          <strong>India</strong>, <strong>China</strong>,
+          <strong>Pakistan</strong>, <strong>Nigeria</strong>, and
+          <strong>Bangladesh</strong> that bear the greatest absolute human
+          impact when population size is considered. This analysis exposes a
+          critical insight: the countries with the most people exposed to
+          dangerous pollution levels are precisely those undergoing rapid
+          economic development, creating a perfect storm of environmental and
+          public health challenges.
+        </p>
+        <p>
+          Perhaps most concerning is the demographic backdrop against which
+          these pollution patterns unfold. Global population growth rates are
+          declining at an unprecedented
+          <strong>&minus;0.18 per 1,000 annually</strong>, projecting a
+          stagnation in world growth rate merely by the late 2020s if current
+          trends continue. This demographic shift, combined with the strong
+          correlations observed between different pollutants (particularly
+          PM&#8322;.&#8325;, NO&#8322;, and HAP), suggests that countries
+          struggling with air quality face compound challenges that require
+          comprehensive, multi-pollutant interventions rather than piecemeal
+          approaches.
+        </p>
+        <p>
+          The mortality analysis reveals profound regional disparities in the
+          balance between population growth and death rates. While Gulf states
+          demonstrate robust growth-mortality gaps driven by economic
+          prosperity, <strong>Eastern European</strong> and post-Soviet nations
+          show concerning patterns where mortality increasingly outpaces
+          population growth. These demographic fault lines, intersecting with
+          pollution exposure patterns, create a complex global health landscape
+          where environmental interventions must be carefully calibrated to
+          local demographic and economic realities.
+        </p>
+        <p>
+          Ultimately, this analysis demonstrates that air pollution and
+          mortality are not merely environmental or health issues — they are
+          fundamental challenges of global equity and sustainable development
+          with almost
+          <strong>36% of deaths strongly influenced by pollutants</strong>. The
+          data compels us toward a future where pollution reduction efforts must
+          prioritize population-weighted impact, recognizing that effective
+          global health policy lies not just in cleaning the most polluted
+          places, but in protecting the greatest number of people from
+          preventable environmental harm.
+        </p>
+      </section>
+    </div>
+
+    <!-- Navigation logic -->
+    <script>
+      document.querySelectorAll(".sidebar nav a").forEach((link) => {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+
+          // Toggle active link
+          document
+            .querySelector(".sidebar nav a.active")
+            .classList.remove("active");
+          link.classList.add("active");
+
+          // Toggle active page
+          document.querySelector(".page.active").classList.remove("active");
+          document.getElementById(link.dataset.page).classList.add("active");
+        });
+      });
+
+      // Inner tabs (Data Preprocessing)
+      document.querySelectorAll(".inner-tabs button").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const tabs = btn.closest(".inner-tabs");
+          const section = tabs.parentElement;
+
+          tabs.querySelector("button.active").classList.remove("active");
+          btn.classList.add("active");
+
+          section
+            .querySelector(".inner-panel.active")
+            .classList.remove("active");
+          section
+            .querySelector("#" + btn.dataset.panel)
+            .classList.add("active");
+        });
+      });
+
+      // Pipeline detail panels
+      document.querySelectorAll("[data-detail]").forEach((el) => {
+        el.addEventListener("click", () => {
+          const targetId = el.dataset.detail;
+          const panel = document.getElementById(targetId);
+          const isOpen = panel.classList.contains("open");
+
+          // Close all panels
+          document
+            .querySelectorAll(".pipeline-detail")
+            .forEach((p) => p.classList.remove("open"));
+          document
+            .querySelectorAll(".pipe-card, .process-node")
+            .forEach((c) => c.classList.remove("active"));
+
+          // Toggle clicked one
+          if (!isOpen) {
+            panel.classList.add("open");
+            el.classList.add("active");
+          }
+        });
+      });
+
+      // Render LaTeX formulas with KaTeX
+      document.addEventListener("DOMContentLoaded", () => {
+        if (typeof renderMathInElement !== "undefined") {
+          renderMathInElement(document.body, {
+            delimiters: [
+              { left: "$$", right: "$$", display: true },
+              { left: "\\(", right: "\\)", display: false },
+            ],
+            throwOnError: false,
+          });
+        }
+
+        // Next-page navigation arrows
+        const navOrder = Array.from(
+          document.querySelectorAll(".sidebar nav a"),
+        );
+        const pages = document.querySelectorAll(".page");
+
+        function makeNavArrow(label, title, onClick) {
+          var nav = document.createElement("div");
+          nav.className = "next-page-nav";
+          nav.innerHTML =
+            '<a><div><span class="nav-label">' +
+            label +
+            '</span><span class="nav-title">' +
+            title +
+            '</span></div><span class="nav-arrow">&rarr;</span></a>';
+          nav.querySelector("a").addEventListener("click", onClick);
+          return nav;
+        }
+
+        function goToPage(pageId) {
+          var link = document.querySelector(
+            '.sidebar nav a[data-page="' + pageId + '"]',
+          );
+          document
+            .querySelector(".sidebar nav a.active")
+            .classList.remove("active");
+          link.classList.add("active");
+          document.querySelector(".page.active").classList.remove("active");
+          document.getElementById(pageId).classList.add("active");
+          window.scrollTo(0, 0);
+        }
+
+        pages.forEach((section) => {
+          var pageId = section.id;
+          var navIdx = navOrder.findIndex((a) => a.dataset.page === pageId);
+          if (navIdx < 0 || navIdx >= navOrder.length - 1) return;
+
+          // Special handling for data-preprocessing: arrows per inner tab
+          if (pageId === "data-preprocessing") {
+            var tabs = section.querySelectorAll(".inner-tabs button");
+            var panels = section.querySelectorAll(".inner-panel");
+            panels.forEach((panel, i) => {
+              if (i < tabs.length - 1) {
+                // Not last tab → go to next inner tab
+                var nextBtn = tabs[i + 1];
+                var nextTitle = nextBtn.textContent.trim();
+                panel.appendChild(
+                  makeNavArrow("Next", nextTitle, function () {
+                    tabs.forEach((b) => b.classList.remove("active"));
+                    nextBtn.classList.add("active");
+                    panels.forEach((p) => p.classList.remove("active"));
+                    panels[i + 1].classList.add("active");
+                    window.scrollTo(0, 0);
+                  }),
+                );
+              } else {
+                // Last tab → go to next page
+                var nextLink = navOrder[navIdx + 1];
+                panel.appendChild(
+                  makeNavArrow(
+                    "Next",
+                    nextLink.textContent.trim(),
+                    function () {
+                      goToPage(nextLink.dataset.page);
+                    },
+                  ),
+                );
+              }
+            });
+            return;
+          }
+
+          var nextLink = navOrder[navIdx + 1];
+          section.appendChild(
+            makeNavArrow("Next", nextLink.textContent.trim(), function () {
+              goToPage(nextLink.dataset.page);
+            }),
+          );
+        });
+
+        // Formula tooltips on hover
+        let popup = null;
+        document.querySelectorAll(".formula-tooltip").forEach((el) => {
+          el.addEventListener("mouseenter", (e) => {
+            const formula = el.dataset.formula;
+            const label = el.dataset.formulaLabel;
+            if (!formula) return;
+            const def = el.dataset.formulaDef || "";
+            const where = el.dataset.formulaWhere || "";
+            popup = document.createElement("div");
+            popup.className = "formula-popup";
+            var mathEl = document.createElement("div");
+            popup.innerHTML =
+              '<div class="tip-label">' +
+              label +
+              "</div>" +
+              (def ? '<div class="tip-def">' + def + "</div>" : "");
+            popup.appendChild(mathEl);
+            if (where)
+              popup.insertAdjacentHTML(
+                "beforeend",
+                '<div class="tip-where">' + where + "</div>",
+              );
+            document.body.appendChild(popup);
+            katex.render(formula, mathEl, {
+              displayMode: true,
+              throwOnError: false,
+            });
+            const rect = el.getBoundingClientRect();
+            popup.style.left =
+              rect.left + rect.width / 2 - popup.offsetWidth / 2 + "px";
+            popup.style.top = rect.top - popup.offsetHeight - 8 + "px";
+          });
+          el.addEventListener("mouseleave", () => {
+            if (popup) {
+              popup.remove();
+              popup = null;
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
